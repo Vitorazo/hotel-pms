@@ -1130,7 +1130,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" placeholder="Buscar item..." oninput="filtrarEstoque(this.value)">
       </div>
-      <div style="display:flex;gap:10px">
+      <div style="display:flex;gap:8px">
         <select id="filtro-cat-estoque" class="field" style="width:170px" onchange="renderEstoque()"></select>
         <button class="btn btn-gold" onclick="abrirModalItemEstoque('consumos')">+ Novo Item</button>
       </div>
@@ -1273,7 +1273,6 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 
 <div class="content" id="sec-dre" style="display:none">
   <div class="section-header">
-
     <div><div class="section-title">DRE</div><div class="section-sub">Demonstração de Resultado — regime de competência (data de criação)</div></div>
     <div class="section-actions">
       <button class="btn btn-ghost" id="btn-massa-dre" style="display:none" onclick="abrirExclusaoMassa('dre')">Gerenciar exclusões</button>
@@ -1506,7 +1505,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   </div>
 
   <div id="admin-tab-excluidos" style="display:none">
-    <p style="font-size:12.5px;color:var(--text3);margin-bottom:14px">Lixeira/histórico de exclusões e arquivamentos de Financeiro, Funcionários, Fornecedores, Estoque e Entradas/Saídas (Compras, Consumos, Café da Manhã, Passaportes, Carregadores, Doces Bertocco, Diversos, Manutenção). Nenhum registro aqui foi apagado de verdade — dá pra restaurar. Boletos nunca aparecem aqui como "excluídos": eles só ficam marcados como órfãos, mas continuam 100% íntegros em Financeiro.</p>
+    <p style="font-size:12.5px;color:var(--text3);margin-bottom:14px">Lixeira/histórico de exclusões e arquivamentos de Financeiro, Funcionários, Fornecedores, Estoque e Entradas/Saídas (Compras, Consumos, Café da Manhã, Passaportes, Carregadores, Doces Bertocco, Diversos, Manutenção). Nenhum registro aqui foi apagado de verdade — dá pra restaurar. A exclusão de boletos é opcional e sempre uma escolha explícita do administrador: quando um boleto vinculado a outro registro não é incluído na exclusão, ele fica intacto no Financeiro; quando é excluído (individualmente ou na exclusão em massa), aparece aqui normalmente, restaurável como qualquer outro item.</p>
     <div class="section-actions" style="justify-content:flex-end;margin-bottom:14px">
       <select id="excluidos-filtro-modulo" class="field" style="width:200px" onchange="renderItensExcluidos()">
         <option value="">Todos os módulos</option>
@@ -1605,11 +1604,11 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
     <p style="font-size:13.5px;color:var(--text2);margin:4px 0 8px" id="exclusao-modal-resumo"></p>
     <p style="font-size:12.5px;color:var(--text3);margin-bottom:10px" id="exclusao-modal-dependencias"></p>
     <div id="exclusao-modal-boleto-aviso" style="display:none;background:#fff3f3;border:1px solid #f3c2c2;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#a33;margin-bottom:10px">
-      ⚠️ Este lançamento é um <strong>Boleto</strong>. Boletos nunca são apagados nem alterados — o registro original permanece 100% intacto (nem um campo é adicionado a ele). O evento é só registrado na auditoria.
+      ⚠️ Este é um <strong>Boleto</strong>. A exclusão de boletos é permitida ao administrador, mas é uma ação sensível — confirme com atenção. Se este boleto é apenas um lançamento vinculado a outro registro que você está excluindo agora, ele continua sendo preservado por padrão; para excluir o boleto em si, faça isso diretamente na tela Financeiro (ou marque essa opção na exclusão em massa). O registro fica sempre restaurável pela Lixeira e a ação é registrada na auditoria.
     </div>
     <div id="exclusao-modal-escolha-ab" style="display:none;margin-bottom:10px">
       <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="exclusao-modo" value="A" checked style="margin-top:3px"> <span><strong>Excluir somente deste módulo</strong> — o lançamento financeiro vinculado é mantido no Financeiro/DRE/Fluxo, sem alteração.</span></label>
-      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2)"><input type="radio" name="exclusao-modo" value="B" style="margin-top:3px"> <span><strong>Excluir também os dados sincronizados</strong> — remove/arquiva também o lançamento financeiro vinculado (boletos são preservados mesmo nesta opção).</span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2)"><input type="radio" name="exclusao-modo" value="B" style="margin-top:3px"> <span><strong>Excluir também os dados sincronizados</strong> — remove/arquiva também o lançamento financeiro vinculado (um boleto vinculado continua sendo preservado por padrão nesta opção, salvo quando você estiver excluindo o boleto diretamente).</span></label>
     </div>
     <div class="field" style="margin-bottom:4px">
       <label>Motivo (opcional)</label>
@@ -1630,7 +1629,13 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
     <p style="font-size:13.5px;color:var(--text2);margin:4px 0 10px" id="massa-modal-intro"></p>
     <ul id="massa-modal-bullets" style="font-size:12.5px;color:var(--text2);margin:0 0 10px;padding-left:18px;line-height:1.7"></ul>
     <div id="massa-modal-boleto-aviso" style="display:none;background:#fff3f3;border:1px solid #f3c2c2;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#a33;margin-bottom:10px">
-      ⚠️ <span id="massa-modal-boleto-aviso-texto"></span> Boletos nunca são apagados ou alterados.
+      ⚠️ <span id="massa-modal-boleto-aviso-texto"></span>
+    </div>
+    <div id="massa-modal-escolha-boleto" style="display:none;margin-bottom:10px">
+      <label style="display:block;font-size:12.5px;color:var(--text2);margin-bottom:6px;font-weight:600">O que deseja excluir?</label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="massa-alvo-boleto" value="lancamentos" checked style="margin-top:3px"> <span>Somente lançamentos financeiros — <span id="massa-modal-boleto-count-lanc"></span> boleto(s) do escopo ficam de fora e são preservados</span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="massa-alvo-boleto" value="boletos" style="margin-top:3px"> <span>Somente boletos — <span id="massa-modal-boleto-count-nb"></span> lançamento(s) não-boleto do escopo ficam de fora</span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2)"><input type="radio" name="massa-alvo-boleto" value="ambos" style="margin-top:3px"> <span>Ambos — lançamentos financeiros e boletos do escopo</span></label>
     </div>
     <div id="massa-modal-escolha-ab" style="display:none;margin-bottom:10px">
       <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="massa-modo" value="A" checked style="margin-top:3px"> <span id="massa-modal-texto-a"><strong>Excluir somente este módulo</strong></span></label>
@@ -2768,20 +2773,22 @@ function moverParaLixeira(modulo, registro, meta){
 
 // ── Remoção protegida de LANÇAMENTOS (substitui todo splice direto em
 // DB.lancamentos no sistema) — ponto único de saída de um lançamento.
-// Boletos NUNCA saem daqui fisicamente: apenas são marcados como
-// órfãos (origem removida), mantendo 100% dos dados originais.
+// Boletos PODEM ser excluídos, mas isso é sempre uma escolha explícita
+// do administrador (opts.incluirBoleto===true). Sem essa flag — como em
+// toda exclusão em cascata que não pediu especificamente para incluir
+// boletos — o boleto continua sendo preservado, exatamente como antes.
 function removerLancamentoComProtecao(lancamentoId, opts){
   opts=opts||{};
   const i=DB.lancamentos.findIndex(l=>l.id===lancamentoId);
   if(i<0) return;
   const lanc=DB.lancamentos[i];
-  if(ehBoleto(lanc)){
-    // Boleto é 100% intocável: NENHUM campo é adicionado/alterado no
-    // objeto original (nem sequer uma flag). O único registro desse
-    // evento fica na auditoria — nunca dentro do próprio boleto.
+  if(ehBoleto(lanc) && !opts.incluirBoleto){
+    // Preservação PADRÃO (não é mais uma regra absoluta): nenhum campo
+    // é adicionado/alterado no boleto original — só fica registrado na
+    // auditoria que a exclusão não incluiu este boleto.
     registrarAuditoria({
-      acao:'origem-removida-boleto-preservado', modulo:'lancamentos', registroId:lanc.id,
-      resumo:resumoRegistro('lancamentos',lanc), motivo:opts.motivo||'Origem deste lançamento foi excluída/arquivada no sistema.', modoEscolhido:opts.modo||null,
+      acao:'boleto-preservado', modulo:'lancamentos', registroId:lanc.id,
+      resumo:resumoRegistro('lancamentos',lanc), motivo:opts.motivo||'Origem removida/arquivada — exclusão de boleto não foi selecionada.', modoEscolhido:opts.modo||null,
     });
     return;
   }
@@ -2929,6 +2936,14 @@ function getDependenciasResiduaisParaExclusaoDefinitiva(modulo, registro){
     modulosComLancamentoId.forEach(([nome,arr])=>{
       if(arr.some(r=>r.lancamentoId===id)) motivos.push(`Existe registro ativo em ${nome} vinculado a este lançamento.`);
     });
+    // 2b) Este lançamento é o registro financeiro gerado por uma Compra
+    // ainda ativa (relação inversa: Compra não guarda lancamentoId, é o
+    // lançamento que guarda origemId/origemTipo='compra'). Vale para
+    // qualquer lançamento, boleto ou não — evita deixar a compra sem
+    // nenhum lançamento correspondente no sistema.
+    if(registro.origemTipo==='compra' && DB.compras.some(c=>c.id===registro.origemId)){
+      motivos.push('Este lançamento é o registro financeiro de uma Compra ainda ativa no sistema.');
+    }
   }
   if(modulo==='compras' && DB.compras.some(c=>c.id===id)){
     motivos.push('Compra ainda consta como ativa no sistema — inconsistência, exclusão bloqueada por segurança.');
@@ -3033,19 +3048,17 @@ function restaurarItemLixeira(itemId){
 }
 
 // ── EXCLUSÃO DEFINITIVA (segunda etapa, só Administrador) ──────────
-// Bloqueia se: (a) o registro é/contém um boleto; (b) qualquer
-// dependência ativa (de qualquer módulo, ver
-// getDependenciasResiduaisParaExclusaoDefinitiva) ainda aponta pro id.
-// Quando permitida, mantém a entrada de auditoria (quem/quando/por
-// quê) mas apaga o conteúdo (payload) do registro — a lixeira deixa de
-// mostrar os dados, só o rastro de que a ação ocorreu.
+// Bloqueia apenas se houver dependência ativa (de qualquer módulo, ver
+// getDependenciasResiduaisParaExclusaoDefinitiva) ainda apontando pro
+// id — boletos seguem a MESMA regra que qualquer outro registro (não
+// há mais bloqueio absoluto específico de boleto). Quando permitida,
+// mantém a entrada de auditoria (quem/quando/por quê) mas apaga o
+// conteúdo (payload) do registro — a lixeira deixa de mostrar os
+// dados, só o rastro de que a ação ocorreu.
 function excluirDefinitivamente(itemId, motivo){
   if(!usuarioEhAdmin()){ toast('Apenas Administrador pode excluir definitivamente.','error'); return false; }
   const item=DB.itensExcluidos.find(x=>x.id===itemId);
   if(!item || item.excluidoDefinitivamente) return false;
-  if(item.modulo==='lancamentos' && ehBoleto(item.registro)){
-    toast('Boletos nunca podem ser excluídos definitivamente.','error'); return false;
-  }
   const motivosBloqueio=item.modulo==='catalogo'
     ? getDependenciasResiduaisCatalogoParaExclusaoDefinitiva(item.registro)
     : getDependenciasResiduaisParaExclusaoDefinitiva(item.modulo, item.registro);
@@ -3137,10 +3150,10 @@ function pedirExclusaoDefinitivaUI(id){
   if(!usuarioEhAdmin()){ toast('Apenas Administrador pode excluir definitivamente.','error'); return; }
   const item=DB.itensExcluidos.find(x=>x.id===id);
   if(!item) return;
-  if(item.modulo==='lancamentos' && ehBoleto(item.registro)){ toast('Boletos nunca podem ser excluídos definitivamente.','error'); return; }
-  const motivo=window.prompt('Esta ação é irreversível e remove os dados definitivamente. Descreva o motivo:');
+  const avisoBoleto=(item.modulo==='lancamentos' && ehBoleto(item.registro)) ? ' Atenção: este registro é um BOLETO.' : '';
+  const motivo=window.prompt('Esta ação é irreversível e remove os dados definitivamente.'+avisoBoleto+' Descreva o motivo:');
   if(motivo===null) return;
-  if(!confirmar('Confirmar EXCLUSÃO DEFINITIVA de "'+resumoRegistro(item.modulo,item.registro)+'"? Isso não pode ser desfeito.')) return;
+  if(!confirmar('Confirmar EXCLUSÃO DEFINITIVA de "'+resumoRegistro(item.modulo,item.registro)+'"?'+avisoBoleto+' Isso não pode ser desfeito.')) return;
   if(excluirDefinitivamente(id, motivo)) renderItensExcluidos();
 }
 function renderItensExcluidos(){
@@ -3233,18 +3246,22 @@ function analisarVinculosLancamentos(lista){
 
 function montarAnaliseLancamentos(modulo, nomeExibicao, textoIntro, lista, range){
   const vinc=analisarVinculosLancamentos(lista);
+  const totalNaoBoleto=lista.length-vinc.boletos.length;
   const bullets=[
-    `${lista.length} lançamento(s) encontrado(s)${range?(' no período '+labelPeriodo(range)):''}`,
-    `${vinc.boletos.length} boleto(s) protegido(s) — nunca serão excluídos ou alterados`,
+    `${lista.length} lançamento(s) encontrado(s)${range?(' no período '+labelPeriodo(range)):''} — sendo ${totalNaoBoleto} não-boleto e ${vinc.boletos.length} boleto(s)`,
+    vinc.boletos.length>0
+      ? 'A exclusão de boletos é opcional — escolha abaixo se eles entram ou não nesta operação.'
+      : 'Nenhum boleto encontrado neste escopo.',
     `${vinc.totalVinculados} registro(s) vinculados em outros módulos (Compras, Consumos, Passaportes, Carregadores, Doces Bertocco, Diversos, Hospedagem Diária)`,
     'Estes lançamentos alimentam o Financeiro, a DRE e o Fluxo de Caixa — as três telas serão atualizadas automaticamente depois da operação.',
   ];
   return {
     modulo, tipo:'lancamentos', titulo:`Excluir informações — ${nomeExibicao}`, textoIntro,
-    bullets, totalGeral:lista.length, totalBoletos:vinc.boletos.length, totalVinculados:vinc.totalVinculados,
+    bullets, totalGeral:lista.length, totalBoletos:vinc.boletos.length, totalNaoBoleto, totalVinculados:vinc.totalVinculados,
+    permiteEscolhaBoleto: vinc.boletos.length>0,
     permiteEscolhaAB: vinc.totalVinculados>0,
     textoA:'Excluir somente os lançamentos financeiros — os registros de Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/Hospedagem Diária vinculados são mantidos (ficam sem lançamento financeiro associado).',
-    textoB:'Excluir também os registros de origem vinculados (Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/Hospedagem Diária), usando a mesma proteção (lixeira + auditoria + estorno de estoque) já usada em cada módulo. Boletos e os registros de origem ligados a um boleto nunca são afetados.',
+    textoB:'Excluir também os registros de origem vinculados (Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/Hospedagem Diária), usando a mesma proteção (lixeira + auditoria + estorno de estoque) já usada em cada módulo. Um registro de origem ligado a um boleto só é afetado se você também escolher incluir boletos na opção acima.',
     escopo:{lista, range},
   };
 }
@@ -3264,7 +3281,7 @@ function montarAnaliseFuncionarios(){
       `${jaInativos} já estão inativos — não serão alterados`,
     ],
     totalGeral:ativosComHistorico+ativosSemHistorico, totalBoletos:0, totalVinculados:ativosComHistorico,
-    permiteEscolhaAB:false, escopo:{},
+    permiteEscolhaAB:false, permiteEscolhaBoleto:false, escopo:{},
   };
 }
 function montarAnaliseEstoque(){
@@ -3283,7 +3300,7 @@ function montarAnaliseEstoque(){
       `${jaInativos} já estão arquivados — não serão alterados`,
     ],
     totalGeral:ativosComHistorico+ativosSemHistorico, totalBoletos:0, totalVinculados:ativosComHistorico,
-    permiteEscolhaAB:false, escopo:{},
+    permiteEscolhaAB:false, permiteEscolhaBoleto:false, escopo:{},
   };
 }
 function analisarExclusaoMassa(modulo){
@@ -3315,7 +3332,14 @@ function abrirExclusaoMassa(modulo){
   document.getElementById('massa-modal-intro').textContent=analise.textoIntro;
   document.getElementById('massa-modal-bullets').innerHTML=analise.bullets.map(b=>`<li>${b}</li>`).join('');
   document.getElementById('massa-modal-boleto-aviso').style.display=analise.totalBoletos>0?'block':'none';
-  document.getElementById('massa-modal-boleto-aviso-texto').textContent=`${analise.totalBoletos} boleto(s) serão preservados automaticamente.`;
+  document.getElementById('massa-modal-boleto-aviso-texto').textContent=`${analise.totalBoletos} boleto(s) encontrado(s) neste escopo. A exclusão de boletos é opcional — escolha abaixo.`;
+  document.getElementById('massa-modal-escolha-boleto').style.display=analise.permiteEscolhaBoleto?'block':'none';
+  if(analise.permiteEscolhaBoleto){
+    document.getElementById('massa-modal-boleto-count-lanc').textContent=analise.totalBoletos;
+    document.getElementById('massa-modal-boleto-count-nb').textContent=analise.totalNaoBoleto;
+    const radioLanc=document.querySelector('input[name="massa-alvo-boleto"][value="lancamentos"]');
+    if(radioLanc) radioLanc.checked=true;
+  }
   document.getElementById('massa-modal-escolha-ab').style.display=analise.permiteEscolhaAB?'block':'none';
   if(analise.permiteEscolhaAB){
     document.getElementById('massa-modal-texto-a').innerHTML=`<strong>Excluir somente este módulo</strong> — ${analise.textoA}`;
@@ -3340,20 +3364,25 @@ function confirmarExclusaoMassa(){
   const motivo=(document.getElementById('massa-modal-motivo').value||'').trim();
   const modoEl=document.querySelector('input[name="massa-modo"]:checked');
   const modo=analise.permiteEscolhaAB?(modoEl?modoEl.value:'A'):null;
-  if(analise.totalGeral>LIMITE_SEGUNDA_CONFIRMACAO_MASSA){
+  const alvoBoletoEl=document.querySelector('input[name="massa-alvo-boleto"]:checked');
+  const alvoBoleto=analise.permiteEscolhaBoleto?(alvoBoletoEl?alvoBoletoEl.value:'lancamentos'):'lancamentos';
+  const incluiBoletoNestaOperacao=alvoBoleto==='boletos'||alvoBoleto==='ambos';
+  if(analise.totalGeral>LIMITE_SEGUNDA_CONFIRMACAO_MASSA || (incluiBoletoNestaOperacao && analise.totalBoletos>0)){
     const nomeCurto=analise.titulo.replace('Excluir informações — ','');
-    const ok=confirmar(`Você está prestes a processar ${analise.totalGeral} registro(s) em ${nomeCurto}. Esta operação não poderá ser desfeita diretamente, mas os registros arquivados/excluídos poderão ser restaurados pela Lixeira ("Itens Excluídos"). Deseja continuar?`);
+    const avisoBoletoTxt=incluiBoletoNestaOperacao&&analise.totalBoletos>0?` Isso inclui ${analise.totalBoletos} boleto(s).`:'';
+    const ok=confirmar(`Você está prestes a processar ${analise.totalGeral} registro(s) em ${nomeCurto}.${avisoBoletoTxt} Esta operação não poderá ser desfeita diretamente, mas os registros arquivados/excluídos poderão ser restaurados pela Lixeira ("Itens Excluídos"). Deseja continuar?`);
     if(!ok) return;
   }
   btn.disabled=true; btn.textContent='Processando...';
   setTimeout(()=>{
     try{
-      const resultado=executarExclusaoMassa(analise, modo, motivo);
+      const resultado=executarExclusaoMassa(analise, modo, motivo, alvoBoleto);
       saveDB();
-      registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado);
+      registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado, alvoBoleto);
       closeModal('modal-exclusao-massa');
       _exclusaoMassaPendente=null;
-      toast(`Operação concluída: ${resultado.excluidos} excluído(s), ${resultado.arquivados} arquivado(s), ${resultado.protegidos} protegido(s) (boleto).`);
+      const detalheBoleto=resultado.excluidosBoletos?` (${resultado.excluidosBoletos} deles boleto)`:'';
+      toast(`Operação concluída: ${resultado.excluidos} excluído(s)${detalheBoleto}, ${resultado.arquivados} arquivado(s), ${resultado.protegidos} preservado(s).`);
       atualizarTelasAposExclusaoMassa();
     } finally {
       btn.disabled=false; btn.textContent='Confirmar';
@@ -3361,8 +3390,8 @@ function confirmarExclusaoMassa(){
   }, 30);
 }
 
-function executarExclusaoMassa(analise, modo, motivo){
-  if(analise.tipo==='lancamentos') return executarExclusaoMassaLancamentos(analise, modo, motivo);
+function executarExclusaoMassa(analise, modo, motivo, alvoBoleto){
+  if(analise.tipo==='lancamentos') return executarExclusaoMassaLancamentos(analise, modo, motivo, alvoBoleto);
   if(analise.tipo==='funcionarios') return executarExclusaoMassaFuncionarios(motivo);
   if(analise.tipo==='estoque') return executarExclusaoMassaEstoque(motivo);
   return {excluidos:0, arquivados:0, protegidos:0};
@@ -3371,10 +3400,14 @@ function executarExclusaoMassa(analise, modo, motivo){
 // Financeiro/DRE/Fluxo compartilham o mesmo executor: os três operam
 // sobre DB.lancamentos (a única fonte real — DRE e Fluxo continuam
 // sendo apenas cálculos em cima dela, nenhum DB.dre foi criado).
-function executarExclusaoMassaLancamentos(analise, modo, motivo){
+// alvoBoleto: 'lancamentos' (padrão, não inclui boleto) | 'boletos'
+// (só boleto) | 'ambos'.
+function executarExclusaoMassaLancamentos(analise, modo, motivo, alvoBoleto){
+  alvoBoleto = alvoBoleto || 'lancamentos';
+  const incluirBoletoNestaOperacao = alvoBoleto==='boletos' || alvoBoleto==='ambos';
   const {lista}=analise.escopo;
   const idsEmEscopo=new Set(lista.map(l=>l.id));
-  let excluidos=0, protegidos=0;
+  let excluidos=0, excluidosBoletos=0, protegidos=0;
   const motivoPadrao=motivo||`Exclusão em massa (${analise.titulo.replace('Excluir informações — ','')})`;
 
   if(modo==='B'){
@@ -3383,45 +3416,56 @@ function executarExclusaoMassaLancamentos(analise, modo, motivo){
     // tela (moverRegistroTransacionalParaLixeira + estorno de estoque
     // idêntico ao de excluirConsumo/excluirPassaporte/excluirCarregador/
     // excluirDocesBertocco/excluirCompra). Pula qualquer vínculo cujo
-    // lançamento é boleto, para não deixar um boleto sem sua origem.
+    // lançamento é boleto E o boleto não foi incluído nesta operação —
+    // preserva a origem para não deixar um boleto ainda ativo sem ela.
     DB.compras.slice().forEach(compra=>{
       const lanc=DB.lancamentos.find(l=>l.origemTipo==='compra'&&l.origemId===compra.id);
-      if(!lanc || !idsEmEscopo.has(lanc.id) || ehBoleto(lanc)) return;
+      if(!lanc || !idsEmEscopo.has(lanc.id) || (ehBoleto(lanc)&&!incluirBoletoNestaOperacao)) return;
       const idx=DB.compras.findIndex(c=>c.id===compra.id);
       if(idx<0) return;
       estornarItensCompra(compra);
       moverRegistroTransacionalParaLixeira('compras', DB.compras, idx, {motivo:motivoPadrao, modo});
     });
     DB.consumos.slice().forEach(c=>{
-      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===c.lancamentoId))) return;
+      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId)) return;
+      const lanc=DB.lancamentos.find(l=>l.id===c.lancamentoId);
+      if(ehBoleto(lanc)&&!incluirBoletoNestaOperacao) return;
       const idx=DB.consumos.findIndex(x=>x.id===c.id);
       if(idx<0) return;
       const item=DB.estoque.find(e=>e.id===c.itemId); if(item) item.qty+=c.qtd;
       moverRegistroTransacionalParaLixeira('consumos', DB.consumos, idx, {motivo:motivoPadrao, modo});
     });
     DB.passaportes.slice().forEach(p=>{
-      if(!p.lancamentoId || !idsEmEscopo.has(p.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===p.lancamentoId))) return;
+      if(!p.lancamentoId || !idsEmEscopo.has(p.lancamentoId)) return;
+      const lanc=DB.lancamentos.find(l=>l.id===p.lancamentoId);
+      if(ehBoleto(lanc)&&!incluirBoletoNestaOperacao) return;
       const idx=DB.passaportes.findIndex(x=>x.id===p.id);
       if(idx<0) return;
       const est=DB.passaportesEstoque.find(x=>x.tipo===p.tipo); if(est) est.qty+=p.qtd;
       moverRegistroTransacionalParaLixeira('passaportes', DB.passaportes, idx, {motivo:motivoPadrao, modo});
     });
     DB.carregadores.slice().forEach(c=>{
-      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===c.lancamentoId))) return;
+      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId)) return;
+      const lanc=DB.lancamentos.find(l=>l.id===c.lancamentoId);
+      if(ehBoleto(lanc)&&!incluirBoletoNestaOperacao) return;
       const idx=DB.carregadores.findIndex(x=>x.id===c.id);
       if(idx<0) return;
       const est=DB.carregadoresEstoque.find(x=>x.tipo===c.tipo); if(est) est.qty+=1;
       moverRegistroTransacionalParaLixeira('carregadores', DB.carregadores, idx, {motivo:motivoPadrao, modo});
     });
     DB.docesBertoccoVendas.slice().forEach(d=>{
-      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===d.lancamentoId))) return;
+      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId)) return;
+      const lanc=DB.lancamentos.find(l=>l.id===d.lancamentoId);
+      if(ehBoleto(lanc)&&!incluirBoletoNestaOperacao) return;
       const idx=DB.docesBertoccoVendas.findIndex(x=>x.id===d.id);
       if(idx<0) return;
       const item=DB.estoque.find(e=>e.id===d.itemId); if(item) item.qty+=d.qtd;
       moverRegistroTransacionalParaLixeira('docesBertoccoVendas', DB.docesBertoccoVendas, idx, {motivo:motivoPadrao, modo});
     });
     DB.diversos.slice().forEach(d=>{
-      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===d.lancamentoId))) return;
+      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId)) return;
+      const lanc=DB.lancamentos.find(l=>l.id===d.lancamentoId);
+      if(ehBoleto(lanc)&&!incluirBoletoNestaOperacao) return;
       const idx=DB.diversos.findIndex(x=>x.id===d.id);
       if(idx<0) return;
       moverRegistroTransacionalParaLixeira('diversos', DB.diversos, idx, {motivo:motivoPadrao, modo});
@@ -3429,16 +3473,20 @@ function executarExclusaoMassaLancamentos(analise, modo, motivo){
   }
 
   // Remove os próprios lançamentos do escopo — reaproveita
-  // removerLancamentoELigados (nunca toca boleto; remove a taxa de
-  // cartão vinculada junto; move para a lixeira; registra auditoria).
+  // removerLancamentoELigados, que propaga incluirBoleto conforme a
+  // escolha do administrador (por padrão nunca toca boleto); remove a
+  // taxa de cartão vinculada junto; move para a lixeira; registra
+  // auditoria.
   lista.forEach(l=>{
     if(!DB.lancamentos.some(x=>x.id===l.id)) return; // já removido (ex.: taxa de cartão de outro lançamento do lote)
-    if(ehBoleto(l)){ protegidos++; return; }
-    removerLancamentoELigados(l.id, {motivo:motivoPadrao, modo});
-    excluidos++;
+    const boleto=ehBoleto(l);
+    if(boleto && alvoBoleto==='lancamentos'){ protegidos++; return; } // fora do escopo escolhido (só lançamentos)
+    if(!boleto && alvoBoleto==='boletos'){ return; } // fora do escopo escolhido (só boletos) — não processado, não contado
+    removerLancamentoELigados(l.id, {motivo:motivoPadrao, modo, incluirBoleto:boleto});
+    if(boleto) excluidosBoletos++; else excluidos++;
   });
 
-  return {excluidos, arquivados:0, protegidos};
+  return {excluidos:excluidos+excluidosBoletos, excluidosBoletos, arquivados:0, protegidos};
 }
 
 function executarExclusaoMassaFuncionarios(motivo){
@@ -3480,13 +3528,15 @@ function executarExclusaoMassaEstoque(motivo){
   return {excluidos, arquivados, protegidos:0};
 }
 
-function registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado){
+function registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado, alvoBoleto){
+  const rotuloAlvo={lancamentos:'só lançamentos financeiros (boletos preservados)', boletos:'só boletos', ambos:'lançamentos financeiros e boletos'}[alvoBoleto]||'';
   registrarAuditoria({
     acao:'exclusao-em-massa', modulo:analise.modulo+'-massa',
-    resumo:`${analise.titulo} — ${resultado.excluidos} excluído(s), ${resultado.arquivados} arquivado(s), ${resultado.protegidos} protegido(s) por serem boleto.${analise.permiteEscolhaAB?(' Opção '+modo+'.'):''} ${analise.totalVinculados} vínculo(s) analisado(s) em outros módulos.`,
-    motivo:motivo||'', modoEscolhido:modo||null,
+    resumo:`${analise.titulo} — ${resultado.excluidos} excluído(s)${resultado.excluidosBoletos?` (${resultado.excluidosBoletos} boleto(s))`:''}, ${resultado.arquivados} arquivado(s), ${resultado.protegidos} preservado(s).${analise.permiteEscolhaBoleto?(' Alvo: '+rotuloAlvo+'.'):''}${analise.permiteEscolhaAB?(' Opção '+modo+'.'):''} ${analise.totalVinculados} vínculo(s) analisado(s) em outros módulos.`,
+    motivo:motivo||'', modoEscolhido:modo||null, alvoBoleto:alvoBoleto||null,
     quantidadeAfetada:analise.totalGeral, arquivados:resultado.arquivados, excluidosFisicamente:resultado.excluidos,
-    protegidos:resultado.protegidos, boletosProtegidos:analise.totalBoletos, dependenciasEncontradas:analise.totalVinculados,
+    excluidosBoletos:resultado.excluidosBoletos||0, protegidos:resultado.protegidos,
+    boletosNoEscopo:analise.totalBoletos, dependenciasEncontradas:analise.totalVinculados,
   });
 }
 
@@ -5836,20 +5886,15 @@ function excluirLancamento(idx){
     temBoleto,
     permiteEscolhaAB: derivados.length>0,
     aoConfirmar:(motivo,modo)=>{
-      if(temBoleto){
-        // Mesmo em exclusão direta pelo Financeiro, o boleto permanece
-        // 100% intocado — nenhum campo é adicionado/alterado nele.
-        // Apenas registramos a tentativa na auditoria.
-        registrarAuditoria({acao:'tentativa-exclusao-boleto-bloqueada', modulo:'lancamentos', registroId:l.id, resumo:resumoRegistro('lancamentos',l), motivo:motivo||'Tentativa de exclusão direta de boleto em Financeiro'});
-        saveDB(); toast('Boletos nunca são alterados ou excluídos — este registro permanece 100% intacto.');
-        renderSection('financeiro');
-        return;
-      }
-      removerLancamentoComProtecao(l.id, {motivo, modo});
+      // A exclusão de boleto é permitida quando o próprio administrador
+      // a solicita diretamente aqui no Financeiro (incluirBoleto:true) —
+      // segue exatamente o mesmo caminho protegido de qualquer outro
+      // lançamento: lixeira, auditoria, restauração.
+      removerLancamentoComProtecao(l.id, {motivo, modo, incluirBoleto:true});
       if(modo==='B'){
-        derivados.forEach(d=>removerLancamentoComProtecao(d.id, {motivo:motivo||'Excluído junto com o lançamento de origem', modo}));
+        derivados.forEach(d=>removerLancamentoComProtecao(d.id, {motivo:motivo||'Excluído junto com o lançamento de origem', modo, incluirBoleto:true}));
       }
-      saveDB(); toast('Lançamento excluído!');
+      saveDB(); toast(temBoleto?'Boleto excluído! Pode ser restaurado pela Lixeira ("Itens Excluídos").':'Lançamento excluído!');
       renderSection('financeiro');
     }
   });
