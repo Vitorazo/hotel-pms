@@ -973,7 +973,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   <div class="panel" style="margin-top:18px">
     <div class="panel-hd"><div class="panel-title">Histórico Diário</div></div>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Data</th><th>Categoria</th><th>Valor Recebido</th><th>Forma Pgto</th></tr></thead>
+      <thead><tr><th>Data</th><th>Categoria</th><th>Valor Recebido</th><th>Forma Pgto</th><th>Ações</th></tr></thead>
       <tbody id="hospmensal-historico-body"></tbody>
     </table></div>
   </div>
@@ -1103,6 +1103,9 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 <div class="content" id="sec-estoque" style="display:none">
   <div class="section-header">
     <div><div class="section-title">Estoque</div><div class="section-sub">Controle por módulo</div></div>
+    <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-estoque" style="display:none" onclick="abrirExclusaoMassa('estoque')">Gerenciar exclusões</button>
+    </div>
   </div>
 
   <div class="panel" style="margin-bottom:18px">
@@ -1196,6 +1199,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   <div class="section-header">
     <div><div class="section-title">Financeiro</div><div class="section-sub">Receitas e despesas consolidadas</div></div>
     <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-financeiro" style="display:none" onclick="abrirExclusaoMassa('financeiro')">Gerenciar exclusões</button>
       <button class="btn btn-ghost" onclick="limparFiltrosFinanceiro()">Limpar Filtros</button>
       <button class="btn btn-gold" onclick="novoLancamento()">+ Novo Lançamento</button>
     </div>
@@ -1272,6 +1276,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 
     <div><div class="section-title">DRE</div><div class="section-sub">Demonstração de Resultado — regime de competência (data de criação)</div></div>
     <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-dre" style="display:none" onclick="abrirExclusaoMassa('dre')">Gerenciar exclusões</button>
       <div class="tabs-inline" style="margin:0">
         <div class="tab-inline on" onclick="setDrePeriodoTipo('mensal',this)">Mensal</div>
         <div class="tab-inline" onclick="setDrePeriodoTipo('quinzenal',this)">Quinzenal</div>
@@ -1292,6 +1297,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   <div class="section-header">
     <div><div class="section-title">Fluxo de Caixa</div><div class="section-sub">Regime de caixa — somente títulos pagos, pela data de pagamento</div></div>
     <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-fluxo" style="display:none" onclick="abrirExclusaoMassa('fluxo')">Gerenciar exclusões</button>
       <div class="tabs-inline" style="margin:0">
         <div class="tab-inline on" onclick="setFluxoPeriodoTipo('mensal',this)">Mensal</div>
         <div class="tab-inline" onclick="setFluxoPeriodoTipo('quinzenal',this)">Quinzenal</div>
@@ -1336,6 +1342,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   <div class="section-header">
     <div><div class="section-title">Funcionários</div><div class="section-sub">Recepção, governança, manutenção e equipe geral</div></div>
     <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-funcionarios" style="display:none" onclick="abrirExclusaoMassa('funcionarios')">Gerenciar exclusões</button>
       <button class="btn btn-gold" onclick="abrirModalFuncionario()">+ Novo Funcionário</button>
     </div>
   </div>
@@ -1417,6 +1424,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
     <div class="tab-inline" onclick="setAdminTab('funcionarios',this)">Funcionários</div>
     <div class="tab-inline" onclick="setAdminTab('usuarios',this)">Usuários</div>
     <div class="tab-inline" onclick="setAdminTab('backups',this)">Backups</div>
+    <div class="tab-inline" onclick="setAdminTab('excluidos',this)">Itens Excluídos</div>
     <div class="tab-inline" onclick="setAdminTab('geral',this)">Categorias & Geral</div>
   </div>
 
@@ -1497,6 +1505,46 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
     </table></div>
   </div>
 
+  <div id="admin-tab-excluidos" style="display:none">
+    <p style="font-size:12.5px;color:var(--text3);margin-bottom:14px">Lixeira/histórico de exclusões e arquivamentos de Financeiro, Funcionários, Fornecedores, Estoque e Entradas/Saídas (Compras, Consumos, Café da Manhã, Passaportes, Carregadores, Doces Bertocco, Diversos, Manutenção). Nenhum registro aqui foi apagado de verdade — dá pra restaurar. Boletos nunca aparecem aqui como "excluídos": eles só ficam marcados como órfãos, mas continuam 100% íntegros em Financeiro.</p>
+    <div class="section-actions" style="justify-content:flex-end;margin-bottom:14px">
+      <select id="excluidos-filtro-modulo" class="field" style="width:200px" onchange="renderItensExcluidos()">
+        <option value="">Todos os módulos</option>
+        <option value="lancamentos">Financeiro (Lançamentos)</option>
+        <option value="compras">Compras</option>
+        <option value="fornecedores">Fornecedores</option>
+        <option value="funcionarios">Funcionários</option>
+        <option value="estoque">Estoque (Produtos)</option>
+        <option value="consumos">Consumos</option>
+        <option value="cafeDiario">Café da Manhã</option>
+        <option value="passaportes">Passaportes</option>
+        <option value="carregadores">Carregadores</option>
+        <option value="docesBertoccoVendas">Doces Bertocco</option>
+        <option value="diversos">Diversos</option>
+        <option value="manutencao">Manutenção</option>
+        <option value="apartamentos">Apartamentos</option>
+        <option value="reservas">Reservas</option>
+        <option value="carregadoresEstoque">Tipos de Carregador</option>
+        <option value="passaportesEstoque">Tipos de Passaporte</option>
+        <option value="folhaMesItens">Itens de Folha Mensal</option>
+        <option value="folhaPadrao">Itens de Folha Padrão</option>
+        <option value="catalogo">Catálogo/Categorias</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text2)"><input type="checkbox" id="excluidos-mostrar-restaurados" onchange="renderItensExcluidos()"> Mostrar já restaurados/removidos</label>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Quando</th><th>Módulo</th><th>Registro</th><th>Ação</th><th>Por</th><th>Motivo</th><th>Status</th><th></th></tr></thead>
+      <tbody id="admin-excluidos-body"></tbody>
+    </table></div>
+    <div class="panel" style="margin-top:20px">
+      <div class="panel-hd"><div class="panel-title">Auditoria Completa</div><div class="panel-sub">Todo evento de exclusão, arquivamento, restauração e exclusão definitiva registrado no sistema</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Quando</th><th>Ação</th><th>Módulo</th><th>Resumo</th><th>Por</th><th>Motivo</th></tr></thead>
+        <tbody id="admin-auditoria-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
   <div id="admin-tab-geral" style="display:none">
     <div class="g3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px" id="admin-cards"></div>
   </div>
@@ -1549,6 +1597,56 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 </div>
 
 <!-- Modal: Confirmação de Restauração de Backup -->
+<!-- Modal: Exclusão Profissional (Financeiro/Funcionários/Fornecedores/Estoque/Entradas e Saídas) -->
+<div class="modal-overlay" id="modal-exclusao-profissional">
+  <div class="modal">
+    <div class="modal-title">Confirmar Exclusão</div>
+    <button class="modal-close" onclick="cancelarExclusaoModal()">✕</button>
+    <p style="font-size:13.5px;color:var(--text2);margin:4px 0 8px" id="exclusao-modal-resumo"></p>
+    <p style="font-size:12.5px;color:var(--text3);margin-bottom:10px" id="exclusao-modal-dependencias"></p>
+    <div id="exclusao-modal-boleto-aviso" style="display:none;background:#fff3f3;border:1px solid #f3c2c2;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#a33;margin-bottom:10px">
+      ⚠️ Este lançamento é um <strong>Boleto</strong>. Boletos nunca são apagados nem alterados — o registro original permanece 100% intacto (nem um campo é adicionado a ele). O evento é só registrado na auditoria.
+    </div>
+    <div id="exclusao-modal-escolha-ab" style="display:none;margin-bottom:10px">
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="exclusao-modo" value="A" checked style="margin-top:3px"> <span><strong>Excluir somente deste módulo</strong> — o lançamento financeiro vinculado é mantido no Financeiro/DRE/Fluxo, sem alteração.</span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2)"><input type="radio" name="exclusao-modo" value="B" style="margin-top:3px"> <span><strong>Excluir também os dados sincronizados</strong> — remove/arquiva também o lançamento financeiro vinculado (boletos são preservados mesmo nesta opção).</span></label>
+    </div>
+    <div class="field" style="margin-bottom:4px">
+      <label>Motivo (opcional)</label>
+      <input type="text" id="exclusao-modal-motivo" class="field" placeholder="Ex.: lançamento duplicado, erro de digitação...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-dark" onclick="cancelarExclusaoModal()">Cancelar</button>
+      <button class="btn btn-gold" onclick="confirmarExclusaoModal()">Confirmar Exclusão</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Exclusão em Massa por Módulo (Financeiro/Funcionários/DRE/Estoque/Fluxo de Caixa) -->
+<div class="modal-overlay" id="modal-exclusao-massa">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title" id="massa-modal-titulo">Excluir informações</div>
+    <button class="modal-close" onclick="cancelarExclusaoMassa()">✕</button>
+    <p style="font-size:13.5px;color:var(--text2);margin:4px 0 10px" id="massa-modal-intro"></p>
+    <ul id="massa-modal-bullets" style="font-size:12.5px;color:var(--text2);margin:0 0 10px;padding-left:18px;line-height:1.7"></ul>
+    <div id="massa-modal-boleto-aviso" style="display:none;background:#fff3f3;border:1px solid #f3c2c2;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#a33;margin-bottom:10px">
+      ⚠️ <span id="massa-modal-boleto-aviso-texto"></span> Boletos nunca são apagados ou alterados.
+    </div>
+    <div id="massa-modal-escolha-ab" style="display:none;margin-bottom:10px">
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2);margin-bottom:6px"><input type="radio" name="massa-modo" value="A" checked style="margin-top:3px"> <span id="massa-modal-texto-a"><strong>Excluir somente este módulo</strong></span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text2)"><input type="radio" name="massa-modo" value="B" style="margin-top:3px"> <span id="massa-modal-texto-b"><strong>Aplicar também aos dados sincronizados</strong></span></label>
+    </div>
+    <div class="field" style="margin-bottom:4px">
+      <label>Motivo (opcional)</label>
+      <input type="text" id="massa-modal-motivo" class="field" placeholder="Ex.: limpeza de dados de teste, reorganização do período...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-dark" onclick="cancelarExclusaoMassa()">Cancelar</button>
+      <button class="btn btn-gold" id="massa-modal-btn-confirmar" onclick="confirmarExclusaoMassa()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-confirmar-restauracao">
   <div class="modal">
     <div class="modal-title">Restaurar Backup</div>
@@ -2437,6 +2535,7 @@ function saveDB(){
       formasPagamento:DB.formasPagamento, taxasCartao:DB.taxasCartao,
       funcionarios:DB.funcionarios, folhaPadrao:DB.folhaPadrao, folhasMensais:DB.folhasMensais,
       manutencao:DB.manutencao,
+      itensExcluidos:DB.itensExcluidos, auditoriaExclusoes:DB.auditoriaExclusoes,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     const ind=document.getElementById('save-indicator');
@@ -2451,6 +2550,14 @@ function loadSavedDB(){
 // ─── ESTADO GLOBAL ────────────────────────────────────────────────
 const DB = {
   periodo:'hoje',
+  // Lixeira/arquivo de registros excluídos (com o registro original
+  // preservado por completo) e log de auditoria de toda ação de
+  // exclusão/arquivamento/restauração. Novo em ambos: quem carregar um
+  // DB salvo antigo (sem essas chaves) simplesmente mantém estes
+  // arrays vazios — ver iniciarAppAposLogin()/restaurarBackup(), que já
+  // só sobrescrevem chaves presentes no dado carregado.
+  itensExcluidos:[],
+  auditoriaExclusoes:[],
   dreCompetencia:new Date().toISOString().slice(0,7),
   drePeriodoTipo:'mensal', dreQuinzena:'1', dreSemana:'',
   fluxoMes:new Date().toISOString().slice(0,7),
@@ -2573,6 +2680,830 @@ function toast(msg,type='success'){
 }
 function confirmar(msg){return window.confirm(msg);}
 
+// ─── CAMADA CENTRAL DE EXCLUSÃO PROFISSIONAL ───────────────────────
+// Bloco 100% novo/aditivo. Nenhuma exclusão nos módulos Financeiro,
+// Funcionários, Fornecedores, Estoque e Entradas/Saídas (Compras,
+// Consumos, Café da Manhã, Passaportes, Carregadores, Doces Bertocco,
+// Diversos, Manutenção) usa mais array.splice() "cru" — tudo passa por
+// aqui, que:
+//   1) nunca apaga E NUNCA ALTERA um lançamento com tipoObrigacao==='Boletos'
+//      (o objeto original permanece 100% intocado — nem um campo é
+//      adicionado a ele; o evento só fica registrado na auditoria);
+//   2) guarda cópia integral do registro em DB.itensExcluidos antes de
+//      qualquer remoção (permite restaurar depois);
+//   3) grava em DB.auditoriaExclusoes quem fez o quê, quando e por quê;
+//   4) para dados de referência com histórico (Fornecedor, Funcionário,
+//      Produto do Estoque) nunca remove do array — só arquiva
+//      (ativo:false), então nada que aponte pro id dele quebra.
+// DB.itensExcluidos e DB.auditoriaExclusoes são 2 chaves novas no
+// objeto DB (persistidas por saveDB() e incluídas em
+// CHAVES_BACKUP_DB) — únicas alterações feitas em saveDB()/DB nesta
+// tarefa, ambas pontuais e aditivas.
+
+function ehBoleto(lanc){ return !!(lanc && lanc.tipoObrigacao === 'Boletos'); }
+
+function usuarioAtualResumo(){
+  return {
+    id:(typeof currentSession!=='undefined' && currentSession?.user?.id) || null,
+    nome:(typeof currentProfile!=='undefined' && currentProfile?.nome) || (typeof currentSession!=='undefined' && currentSession?.user?.email) || 'Desconhecido',
+  };
+}
+
+function registrarAuditoria(entrada){
+  DB.auditoriaExclusoes.push(Object.assign({
+    id:gerarId(), quando:new Date().toISOString(), usuario:usuarioAtualResumo(),
+  }, entrada));
+}
+
+// Resumo curto e legível de um registro, usado no modal de confirmação,
+// na lixeira e na auditoria.
+function resumoRegistro(modulo, r){
+  if(!r) return '(registro indisponível)';
+  const mapa={
+    lancamentos:()=>`${r.desc||'Lançamento'} — ${fmtMoney(r.valor)} — ${fmtDate(r.dataCriacao)}${r.tipoObrigacao?' — '+r.tipoObrigacao:''}`,
+    compras:()=>`Compra — ${r.fornecedorNome||'—'} — ${fmtMoney(r.valorTotal)} — ${fmtDate(r.dataCriacao)}`,
+    fornecedores:()=>`Fornecedor — ${r.nome}`,
+    funcionarios:()=>`Funcionário — ${r.nome} (${r.funcao||'—'})`,
+    estoque:()=>`Produto — ${r.nome} (${r.cat||'—'})`,
+    consumos:()=>`Consumo — ${r.itemNome||'—'} — ${fmtMoney(r.total)} — ${fmtDate(r.data)}`,
+    passaportes:()=>`Passaporte — ${r.tipo||'—'} — ${fmtMoney(r.valor)} — ${fmtDate(r.data)}`,
+    carregadores:()=>`Carregador — ${r.tipo||'—'} — ${fmtMoney(r.valor)} — ${fmtDate(r.data)}`,
+    docesBertoccoVendas:()=>`Doces Bertocco — ${r.itemNome||'—'} — ${fmtMoney(r.total)} — ${fmtDate(r.data)}`,
+    diversos:()=>`Diverso — ${r.desc||'—'} — ${fmtMoney(r.valor)} — ${fmtDate(r.data)}`,
+    cafeDiario:()=>`Café da Manhã — ${fmtDate(r.data)} — ${r.servidos||0} servidos`,
+    manutencao:()=>`Manutenção — ${r.descricao||'—'}`,
+    apartamentos:()=>`Apartamento — ${r.numero||'—'} (${r.categoria||'—'})`,
+    reservas:()=>`Reserva — ${r.cliente||'—'} — ${fmtDate(r.checkin)} a ${fmtDate(r.checkout)}`,
+    carregadoresEstoque:()=>`Tipo de Carregador — ${r.tipo||'—'} (qty ${r.qty ?? '—'})`,
+    passaportesEstoque:()=>`Tipo de Passaporte — ${r.tipo||'—'} (qty ${r.qty ?? '—'})`,
+    folhaMesItens:()=>`Item de Folha — ${r.desc||'—'} — ${fmtMoney(r.valor)}`,
+    folhaPadrao:()=>`Item de Folha Padrão — ${r.desc||'—'} — ${fmtMoney(r.valor)}`,
+    catalogo:()=>`Item de Catálogo (${r.chave||'—'}) — ${r.valor||'—'}`,
+  };
+  try{ return (mapa[modulo]||(()=>JSON.stringify(r).slice(0,90)))(); }
+  catch(e){ return '(registro sem resumo disponível)'; }
+}
+
+// Move um registro para a lixeira (DB.itensExcluidos), guardando uma
+// CÓPIA COMPLETA e intocada do objeto original. Não altera o registro
+// em si — só embrulha com metadados de quem/quando/por quê.
+function moverParaLixeira(modulo, registro, meta){
+  meta=meta||{};
+  const entrada={
+    id:gerarId(), modulo, registro:JSON.parse(JSON.stringify(registro)),
+    tipoAcao:meta.tipoAcao||'excluido', // 'excluido' (saiu do array de origem) | 'arquivado' (continua lá, só inativado)
+    quando:new Date().toISOString(), usuario:usuarioAtualResumo(),
+    motivo:meta.motivo||'', modoEscolhido:meta.modoEscolhido||null, grupoId:meta.grupoId||null,
+    contexto:meta.contexto||null, // dados extras p/ restaurar quando o registro não vive num array simples por id (ex.: item de folha mensal, item de catálogo)
+    restaurado:false, restauradoEm:null, restauradoPor:null, excluidoDefinitivamente:false,
+  };
+  DB.itensExcluidos.push(entrada);
+  registrarAuditoria({
+    acao:entrada.tipoAcao, modulo, registroId:registro?.id||null,
+    resumo:resumoRegistro(modulo,registro), motivo:entrada.motivo, modoEscolhido:entrada.modoEscolhido,
+    itemLixeiraId:entrada.id,
+  });
+  return entrada;
+}
+
+// ── Remoção protegida de LANÇAMENTOS (substitui todo splice direto em
+// DB.lancamentos no sistema) — ponto único de saída de um lançamento.
+// Boletos NUNCA saem daqui fisicamente: apenas são marcados como
+// órfãos (origem removida), mantendo 100% dos dados originais.
+function removerLancamentoComProtecao(lancamentoId, opts){
+  opts=opts||{};
+  const i=DB.lancamentos.findIndex(l=>l.id===lancamentoId);
+  if(i<0) return;
+  const lanc=DB.lancamentos[i];
+  if(ehBoleto(lanc)){
+    // Boleto é 100% intocável: NENHUM campo é adicionado/alterado no
+    // objeto original (nem sequer uma flag). O único registro desse
+    // evento fica na auditoria — nunca dentro do próprio boleto.
+    registrarAuditoria({
+      acao:'origem-removida-boleto-preservado', modulo:'lancamentos', registroId:lanc.id,
+      resumo:resumoRegistro('lancamentos',lanc), motivo:opts.motivo||'Origem deste lançamento foi excluída/arquivada no sistema.', modoEscolhido:opts.modo||null,
+    });
+    return;
+  }
+  DB.lancamentos.splice(i,1);
+  moverParaLixeira('lancamentos', lanc, {motivo:opts.motivo, modoEscolhido:opts.modo, grupoId:opts.grupoId, tipoAcao:'excluido'});
+}
+
+// Substitui, com a mesma assinatura de antes, a função já usada por
+// Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/
+// Hospedagem Diária — agora protegida contra apagar boleto.
+function removerLancamentoELigados(lancamentoId, opts){
+  if(!lancamentoId) return;
+  const idsParaRemover=[];
+  for(let i=DB.lancamentos.length-1;i>=0;i--){
+    const l=DB.lancamentos[i];
+    if(l.id===lancamentoId || (l.origemTipo==='taxa-cartao' && l.origemId===lancamentoId)){
+      idsParaRemover.push(l.id);
+    }
+  }
+  idsParaRemover.forEach(id=>removerLancamentoComProtecao(id, opts));
+}
+
+// ── Registros TRANSACIONAIS simples (Consumos, Café da Manhã,
+// Passaportes, Carregadores, Doces Bertocco, Diversos, Manutenção,
+// Compras): saem do array de origem, mas com cópia preservada na
+// lixeira e log de auditoria — restauráveis.
+function moverRegistroTransacionalParaLixeira(modulo, arrayRef, idx, opts){
+  opts=opts||{};
+  const registro=arrayRef[idx];
+  if(!registro) return null;
+  arrayRef.splice(idx,1);
+  return moverParaLixeira(modulo, registro, {motivo:opts.motivo, modoEscolhido:opts.modo, grupoId:opts.grupoId, tipoAcao:'excluido'});
+}
+
+// ── Proteção BÁSICA (lixeira + auditoria, SEM modal rico nem escolha
+// A/B) — para módulos sem boleto e sem lançamento vinculado: Apartamentos,
+// Reservas, Tipos de Carregador/Passaporte, itens de Folha Mensal e
+// Catálogo/Categorias. Mantém o mesmo `confirmar()` simples que essas
+// telas já usavam; só troca o `.splice()` cru por lixeira+auditoria,
+// tornando o registro restaurável.
+function excluirComProtecaoBasica(modulo, arrayRef, idx, opts){
+  opts=opts||{};
+  const registro=arrayRef[idx];
+  if(registro===undefined) return null;
+  arrayRef.splice(idx,1);
+  return moverParaLixeira(modulo, registro, {motivo:opts.motivo, tipoAcao:'excluido', contexto:opts.contexto});
+}
+
+// ── Arquivamento de registros de REFERÊNCIA com histórico
+// (Fornecedor, Funcionário, Produto do Estoque): NUNCA saem do array —
+// só ficam com ativo:false. Garante que nada que referencia o id
+// (compras, folhas, vendas antigas) perca a identificação. Registra
+// também na lixeira/auditoria (tipoAcao:'arquivado') para ficar visível
+// e reversível na tela "Itens Excluídos".
+function arquivarRegistroReferencia(modulo, registro, opts){
+  opts=opts||{};
+  const antes=JSON.parse(JSON.stringify(registro));
+  registro.ativo=false;
+  const entrada=moverParaLixeira(modulo, antes, {motivo:opts.motivo, tipoAcao:'arquivado'});
+  entrada.idOriginal=registro.id; // permite localizar o registro (que continua no array) na restauração
+  return entrada;
+}
+
+function restaurarRegistroReferencia(modulo, arrayRef, id){
+  const r=arrayRef.find(x=>x.id===id);
+  if(r) r.ativo=true;
+  return !!r;
+}
+
+// ── Dependências (para exibir no modal e para bloquear exclusão
+// definitiva quando ainda houver histórico apontando pro registro) ──
+function getDependenciasFornecedor(id){
+  const compras=DB.compras.filter(c=>c.fornecedorId===id);
+  return {temHistorico:compras.length>0, resumo:compras.length?`${compras.length} compra(s) vinculada(s)`:'Nenhuma compra vinculada'};
+}
+function getDependenciasFuncionario(id){
+  const meses=Object.keys(DB.folhasMensais||{}).filter(m=>DB.folhasMensais[m]?.itens && Object.prototype.hasOwnProperty.call(DB.folhasMensais[m].itens,id));
+  return {temHistorico:meses.length>0, resumo:meses.length?`Folha gerada em ${meses.length} mês(es)`:'Nenhuma folha gerada'};
+}
+function getDependenciasEstoqueItem(id){
+  const emCompras=DB.compras.some(c=>c.itens.some(it=>it.itemId===id));
+  const emConsumos=DB.consumos.some(c=>c.itemId===id);
+  const emDoces=DB.docesBertoccoVendas.some(d=>d.itemId===id);
+  const temHistorico=emCompras||emConsumos||emDoces;
+  return {temHistorico, resumo:temHistorico?'Já apareceu em compras e/ou vendas — histórico de CMV depende deste produto':'Nunca foi comprado nem vendido'};
+}
+function getDependenciasApartamento(id){
+  const reservas=DB.reservas.filter(r=>r.aptoId===id);
+  return {temHistorico:reservas.length>0, resumo:reservas.length?`${reservas.length} reserva(s) vinculada(s) a este apartamento`:'Nenhuma reserva vinculada'};
+}
+// Verifica se um valor de CATÁLOGO (categoria/centro de custo/forma de
+// pagamento/prioridade etc.) já está em uso por algum registro real do
+// sistema. Categorias são strings copiadas (não referência viva), mas
+// removê-las do catálogo faria o histórico "sumir" das telas de
+// filtro/cadastro — por isso a exclusão é bloqueada enquanto houver uso.
+function getDependenciasCatalogo(chave, valor){
+  const checagens={
+    categoriasApto:()=> DB.apartamentos.some(a=>a.categoria===valor)
+      || DB.reservas.some(r=>r.categoria===valor)
+      || Object.values(DB.hospedagensDiarias||{}).some(dia=>Object.prototype.hasOwnProperty.call(dia||{},valor)),
+    categoriasEstoque:()=> DB.estoque.some(e=>e.cat===valor),
+    categoriasFornecedores:()=> DB.fornecedores.some(f=>f.cat===valor),
+    categoriasFinanceiras:()=> DB.lancamentos.some(l=>l.categoria===valor),
+    centrosCusto:()=> DB.lancamentos.some(l=>l.centroCusto===valor) || DB.compras.some(c=>c.centroCusto===valor),
+    formasPagamento:()=> DB.lancamentos.some(l=>l.formaPgto===valor) || DB.reservas.some(r=>r.formaPgto===valor) || DB.compras.some(c=>c.formaPgto===valor),
+    categoriasDiversos:()=> DB.diversos.some(d=>d.categoria===valor),
+    categoriasManutencao:()=> DB.manutencao.some(m=>m.categoria===valor),
+    prioridadesManutencao:()=> DB.manutencao.some(m=>m.prioridade===valor),
+  };
+  const fn=checagens[chave];
+  const temHistorico = fn ? !!fn() : false; // catálogo não mapeado: sem checagem conhecida, não bloqueia
+  return {temHistorico, resumo:temHistorico?'Este item já é usado por registros existentes':'Não está em uso por nenhum registro'};
+}
+
+// ── Checagem abrangente para EXCLUSÃO DEFINITIVA ────────────────────
+// Verifica, para QUALQUER módulo, se algum outro dado ATIVO no sistema
+// ainda referencia o id do registro que se quer apagar de vez.
+// Em caso de dúvida, bloqueia (retorna motivo) — nunca deixa passar
+// silenciosamente. Módulos com array próprio (Consumos, Café da
+// Manhã, Passaportes, Carregadores, Doces Bertocco, Diversos,
+// Manutenção) não têm nada no sistema que aponte de volta pro seu id
+// (a relação é sempre no sentido registro→lancamentoId, nunca o
+// contrário), então para esses só valem as checagens genéricas abaixo.
+function getDependenciasResiduaisParaExclusaoDefinitiva(modulo, registro){
+  const motivos=[];
+  const id=registro?.id;
+  if(!id) return motivos;
+
+  // 1) Qualquer LANÇAMENTO ainda ativo que referencia este id como
+  // origem (origemId) — cobre encargo/desconto de baixa e parcela
+  // irmã (quando o alvo é um lançamento) e também o lançamento
+  // auto-gerado de uma Compra (quando o alvo é a própria compra),
+  // já que ambos os casos usam o mesmo campo origemId.
+  if(DB.lancamentos.some(l=>l.origemId===id)){
+    motivos.push('Existe lançamento financeiro ativo que referencia este registro como origem (ex.: encargo/desconto de baixa, parcela ou lançamento gerado por ele).');
+  }
+
+  if(modulo==='lancamentos'){
+    // 2) Qualquer registro transacional ATIVO cujo lancamentoId ainda
+    // aponta para este lançamento.
+    const modulosComLancamentoId=[
+      ['Consumos',DB.consumos],['Passaportes',DB.passaportes],['Carregadores',DB.carregadores],
+      ['Doces Bertocco',DB.docesBertoccoVendas],['Diversos',DB.diversos],
+    ];
+    modulosComLancamentoId.forEach(([nome,arr])=>{
+      if(arr.some(r=>r.lancamentoId===id)) motivos.push(`Existe registro ativo em ${nome} vinculado a este lançamento.`);
+    });
+  }
+  if(modulo==='compras' && DB.compras.some(c=>c.id===id)){
+    motivos.push('Compra ainda consta como ativa no sistema — inconsistência, exclusão bloqueada por segurança.');
+  }
+  if(modulo==='fornecedores'){
+    const dep=getDependenciasFornecedor(id);
+    if(dep.temHistorico) motivos.push('Ainda há compras vinculadas a este fornecedor.');
+  }
+  if(modulo==='funcionarios'){
+    const dep=getDependenciasFuncionario(id);
+    if(dep.temHistorico) motivos.push('Ainda há folha de pagamento gerada para este funcionário.');
+  }
+  if(modulo==='estoque'){
+    const dep=getDependenciasEstoqueItem(id);
+    if(dep.temHistorico) motivos.push('Ainda há compras/vendas históricas deste produto (necessárias para o CMV).');
+  }
+  if(modulo==='apartamentos'){
+    const dep=getDependenciasApartamento(id);
+    if(dep.temHistorico) motivos.push('Ainda há reservas vinculadas a este apartamento.');
+  }
+  return motivos;
+}
+// Checagem própria para EXCLUSÃO DEFINITIVA de um item de CATÁLOGO na
+// lixeira (registro não tem `id`, por isso fica fora da função acima).
+function getDependenciasResiduaisCatalogoParaExclusaoDefinitiva(registro){
+  const chave=registro?.chave, valor=registro?.valor;
+  if(!chave || valor===undefined) return [];
+  const dep=getDependenciasCatalogo(chave, valor);
+  return dep.temHistorico?['Este valor de catálogo voltou a ser usado por algum registro — exclusão definitiva bloqueada.']:[];
+}
+
+// ── RESTAURAÇÃO (tela "Itens Excluídos") ────────────────────────────
+// Nunca cria duplicata: para item 'excluido' só devolve pro array se
+// nenhum registro com o mesmo id já existir lá; para 'arquivado' só
+// reativa o registro que já está no array (nunca insere de novo).
+function restaurarItemLixeira(itemId){
+  const item=DB.itensExcluidos.find(x=>x.id===itemId);
+  if(!item || item.restaurado || item.excluidoDefinitivamente) return false;
+
+  // Casos "aninhados", sem array simples por id: item de folha mensal
+  // e item de catálogo/categoria. Tratados à parte, usando o contexto
+  // salvo no momento da exclusão.
+  if(item.modulo==='folhaMesItens'){
+    const ctx=item.contexto||{};
+    if(!ctx.mesAno || !ctx.funcId) return false;
+    const folha=garantirFolhaMes(ctx.mesAno);
+    if(folha.pago) return false; // mesma proteção usada na remoção: nunca mexe em folha já paga
+    const itens=getItensFolhaMes(ctx.mesAno, ctx.funcId);
+    const jaExiste=itens.some(i=>JSON.stringify(i)===JSON.stringify(item.registro));
+    if(jaExiste) return false;
+    itens.push(JSON.parse(JSON.stringify(item.registro)));
+    atualizarLancamentoFolhaSePago(ctx.mesAno);
+  } else if(item.modulo==='folhaPadrao'){
+    const ctx=item.contexto||{};
+    if(!ctx.funcId) return false;
+    const itens=garantirFolhaPadrao(ctx.funcId);
+    const jaExiste=itens.some(i=>JSON.stringify(i)===JSON.stringify(item.registro));
+    if(jaExiste) return false;
+    itens.push(JSON.parse(JSON.stringify(item.registro)));
+  } else if(item.modulo==='catalogo'){
+    const ctx=item.contexto||{};
+    const chave=ctx.chave||item.registro?.chave;
+    if(!chave || !DB[chave]) return false;
+    if(DB[chave].includes(item.registro.valor)) return false; // evita duplicata
+    DB[chave].push(item.registro.valor);
+  } else {
+    const arrayPorModulo={
+      lancamentos:DB.lancamentos, compras:DB.compras, consumos:DB.consumos,
+      cafeDiario:DB.cafeDiario, passaportes:DB.passaportes, carregadores:DB.carregadores,
+      docesBertoccoVendas:DB.docesBertoccoVendas, diversos:DB.diversos, manutencao:DB.manutencao,
+      fornecedores:DB.fornecedores, funcionarios:DB.funcionarios, estoque:DB.estoque,
+      apartamentos:DB.apartamentos, reservas:DB.reservas,
+      carregadoresEstoque:DB.carregadoresEstoque, passaportesEstoque:DB.passaportesEstoque,
+    };
+    const arr=arrayPorModulo[item.modulo];
+    if(!arr) return false;
+    // carregadoresEstoque/passaportesEstoque não têm campo id (a chave
+    // natural é `tipo`); os demais módulos deste mapa têm id.
+    const chaveMatch=(item.modulo==='carregadoresEstoque'||item.modulo==='passaportesEstoque')?'tipo':'id';
+    if(item.tipoAcao==='arquivado'){
+      const ok=restaurarRegistroReferencia(item.modulo, arr, item.registro.id);
+      if(!ok) return false;
+    } else {
+      const jaExiste=arr.some(x=>x[chaveMatch]===item.registro[chaveMatch]);
+      if(jaExiste) return false; // evita duplicata
+      arr.push(JSON.parse(JSON.stringify(item.registro)));
+      // Hospedagem diária: o valor também vive no cache DB.hospedagensDiarias
+      // (usado só para preencher o formulário do dia) — sem isso, o
+      // lançamento restaurado apareceria no Financeiro/DRE mas o campo
+      // do dia continuaria em branco.
+      if(item.modulo==='lancamentos' && item.registro.origemTipo==='hospedagem-diaria' && item.registro.origemId){
+        const [dia,cat]=item.registro.origemId.split('|');
+        if(dia && cat){ DB.hospedagensDiarias[dia]=DB.hospedagensDiarias[dia]||{}; DB.hospedagensDiarias[dia][cat]=item.registro.valor; }
+      }
+    }
+  }
+
+  item.restaurado=true; item.restauradoEm=new Date().toISOString(); item.restauradoPor=usuarioAtualResumo();
+  registrarAuditoria({acao:'restaurado', modulo:item.modulo, registroId:item.registro.id||null, resumo:resumoRegistro(item.modulo,item.registro), itemLixeiraId:item.id});
+  saveDB();
+  return true;
+}
+
+// ── EXCLUSÃO DEFINITIVA (segunda etapa, só Administrador) ──────────
+// Bloqueia se: (a) o registro é/contém um boleto; (b) qualquer
+// dependência ativa (de qualquer módulo, ver
+// getDependenciasResiduaisParaExclusaoDefinitiva) ainda aponta pro id.
+// Quando permitida, mantém a entrada de auditoria (quem/quando/por
+// quê) mas apaga o conteúdo (payload) do registro — a lixeira deixa de
+// mostrar os dados, só o rastro de que a ação ocorreu.
+function excluirDefinitivamente(itemId, motivo){
+  if(!usuarioEhAdmin()){ toast('Apenas Administrador pode excluir definitivamente.','error'); return false; }
+  const item=DB.itensExcluidos.find(x=>x.id===itemId);
+  if(!item || item.excluidoDefinitivamente) return false;
+  if(item.modulo==='lancamentos' && ehBoleto(item.registro)){
+    toast('Boletos nunca podem ser excluídos definitivamente.','error'); return false;
+  }
+  const motivosBloqueio=item.modulo==='catalogo'
+    ? getDependenciasResiduaisCatalogoParaExclusaoDefinitiva(item.registro)
+    : getDependenciasResiduaisParaExclusaoDefinitiva(item.modulo, item.registro);
+  if(motivosBloqueio.length){
+    toast('Não é possível excluir definitivamente: '+motivosBloqueio.join(' '),'error');
+    return false;
+  }
+  item.excluidoDefinitivamente=true;
+  const resumoAntes=resumoRegistro(item.modulo,item.registro);
+  item.registro={id:item.registro.id, _removidoDefinitivamente:true};
+  registrarAuditoria({acao:'excluido-definitivamente', modulo:item.modulo, registroId:item.id, resumo:resumoAntes, motivo:motivo||'', itemLixeiraId:item.id});
+  saveDB();
+  toast('Registro excluído definitivamente.');
+  return true;
+}
+
+// ── Modal de confirmação (dispatcher genérico) ──────────────────────
+let _exclusaoPendente=null;
+function abrirModalExclusaoGenerico(cfg){
+  _exclusaoPendente=cfg;
+  document.getElementById('exclusao-modal-resumo').innerHTML=cfg.resumoHTML||'';
+  document.getElementById('exclusao-modal-dependencias').innerHTML=cfg.dependenciasHTML||'';
+  document.getElementById('exclusao-modal-boleto-aviso').style.display=cfg.temBoleto?'block':'none';
+  document.getElementById('exclusao-modal-escolha-ab').style.display=cfg.permiteEscolhaAB?'block':'none';
+  document.getElementById('exclusao-modal-motivo').value='';
+  document.querySelectorAll('input[name="exclusao-modo"]').forEach(r=>{r.checked=(r.value==='A');});
+  openModal('modal-exclusao-profissional');
+}
+function cancelarExclusaoModal(){ _exclusaoPendente=null; closeModal('modal-exclusao-profissional'); }
+function confirmarExclusaoModal(){
+  if(!_exclusaoPendente) return;
+  const motivo=(document.getElementById('exclusao-modal-motivo').value||'').trim();
+  const modoEl=document.querySelector('input[name="exclusao-modo"]:checked');
+  const modo=modoEl?modoEl.value:null;
+  const fn=_exclusaoPendente.aoConfirmar;
+  closeModal('modal-exclusao-profissional');
+  _exclusaoPendente=null;
+  fn(motivo,modo);
+}
+
+// Helper compartilhado pelos módulos transacionais que têm um
+// lançamento financeiro vinculado por `lancamentoId` (Consumos, Café
+// da Manhã não usa este helper por não ter lançamento; Passaportes,
+// Carregadores, Doces Bertocco, Diversos usam). Oferece a escolha A/B
+// quando há lançamento vinculado; a proteção de boleto é automática
+// (via removerLancamentoELigados → removerLancamentoComProtecao).
+function excluirComLancamentoVinculado(modulo, arrayRef, idx, opts){
+  opts=opts||{};
+  const registro=arrayRef[idx];
+  if(!registro) return;
+  const lanc=registro.lancamentoId?DB.lancamentos.find(l=>l.id===registro.lancamentoId):null;
+  const temBoleto=ehBoleto(lanc);
+  abrirModalExclusaoGenerico({
+    modulo,
+    resumoHTML:resumoRegistro(modulo,registro),
+    dependenciasHTML: lanc
+      ? `Lançamento financeiro vinculado: <strong>${resumoRegistro('lancamentos',lanc)}</strong>.${opts.observacao?(' '+opts.observacao):''}`
+      : `Nenhum lançamento financeiro vinculado encontrado.${opts.observacao?(' '+opts.observacao):''}`,
+    temBoleto,
+    permiteEscolhaAB: !!lanc,
+    aoConfirmar:(motivo,modo)=>{
+      if(opts.onEstorno) opts.onEstorno(registro);
+      const manterLancamento = modo==='A';
+      if(lanc && !manterLancamento){
+        removerLancamentoELigados(registro.lancamentoId, {motivo:motivo||`${opts.rotulo||modulo} excluído`, modo});
+      }
+      moverRegistroTransacionalParaLixeira(modulo, arrayRef, idx, {motivo, modo});
+      saveDB();
+      toast(opts.msgSucesso||'Registro excluído!');
+      renderSection(opts.secaoRender||modulo);
+    }
+  });
+}
+
+// ── Tela "Itens Excluídos" (Painel Administrativo) ──────────────────
+const NOMES_MODULO_EXCLUSAO={
+  lancamentos:'Financeiro', compras:'Compras', fornecedores:'Fornecedores', funcionarios:'Funcionários',
+  estoque:'Estoque', consumos:'Consumos', cafeDiario:'Café da Manhã', passaportes:'Passaportes',
+  carregadores:'Carregadores', docesBertoccoVendas:'Doces Bertocco', diversos:'Diversos', manutencao:'Manutenção',
+  apartamentos:'Apartamentos', reservas:'Reservas', carregadoresEstoque:'Tipos de Carregador',
+  passaportesEstoque:'Tipos de Passaporte', folhaMesItens:'Itens de Folha Mensal', folhaPadrao:'Itens de Folha Padrão', catalogo:'Catálogo/Categorias',
+};
+function restaurarItemLixeiraUI(id){
+  if(!confirmar('Restaurar este registro? Ele volta a aparecer normalmente no sistema.')) return;
+  if(restaurarItemLixeira(id)){ toast('Registro restaurado!'); renderItensExcluidos(); }
+  else toast('Não foi possível restaurar (já restaurado ou inconsistente).','error');
+}
+function pedirExclusaoDefinitivaUI(id){
+  if(!usuarioEhAdmin()){ toast('Apenas Administrador pode excluir definitivamente.','error'); return; }
+  const item=DB.itensExcluidos.find(x=>x.id===id);
+  if(!item) return;
+  if(item.modulo==='lancamentos' && ehBoleto(item.registro)){ toast('Boletos nunca podem ser excluídos definitivamente.','error'); return; }
+  const motivo=window.prompt('Esta ação é irreversível e remove os dados definitivamente. Descreva o motivo:');
+  if(motivo===null) return;
+  if(!confirmar('Confirmar EXCLUSÃO DEFINITIVA de "'+resumoRegistro(item.modulo,item.registro)+'"? Isso não pode ser desfeito.')) return;
+  if(excluirDefinitivamente(id, motivo)) renderItensExcluidos();
+}
+function renderItensExcluidos(){
+  const tbody=document.getElementById('admin-excluidos-body');
+  const tbodyAud=document.getElementById('admin-auditoria-body');
+  if(!tbody||!tbodyAud) return;
+  const filtroModulo=document.getElementById('excluidos-filtro-modulo')?.value||'';
+  const mostrarTodos=document.getElementById('excluidos-mostrar-restaurados')?.checked;
+  let lista=DB.itensExcluidos.slice().sort((a,b)=>(b.quando||'').localeCompare(a.quando||''));
+  if(filtroModulo) lista=lista.filter(i=>i.modulo===filtroModulo);
+  if(!mostrarTodos) lista=lista.filter(i=>!i.restaurado && !i.excluidoDefinitivamente);
+  tbody.innerHTML=lista.map(item=>{
+    const status=item.excluidoDefinitivamente?'<span class="badge badge-bad">Excluído definitivamente</span>'
+      :item.restaurado?'<span class="badge badge-ok">Restaurado</span>'
+      :(item.tipoAcao==='arquivado'?'<span class="badge badge-warn">Arquivado</span>':'<span class="badge badge-bad">Excluído</span>');
+    const acoes=(!item.restaurado && !item.excluidoDefinitivamente)
+      ? `<button class="btn btn-ghost" onclick="restaurarItemLixeiraUI('${item.id}')">Restaurar</button> ${usuarioEhAdmin()?`<button class="btn btn-ghost" onclick="pedirExclusaoDefinitivaUI('${item.id}')">Excluir Definitivo</button>`:''}`
+      : '—';
+    return `<tr>
+      <td>${fmtDate(item.quando?item.quando.slice(0,10):'')} ${item.quando?item.quando.slice(11,16):''}</td>
+      <td>${NOMES_MODULO_EXCLUSAO[item.modulo]||item.modulo}</td>
+      <td>${resumoRegistro(item.modulo,item.registro)}</td>
+      <td>${item.tipoAcao==='arquivado'?'Arquivamento':'Exclusão'}</td>
+      <td>${item.usuario?.nome||'—'}</td>
+      <td>${item.motivo||'—'}</td>
+      <td>${status}</td>
+      <td>${acoes}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhum item excluído${filtroModulo?' neste módulo':''}.</td></tr>`;
+
+  const auditoria=DB.auditoriaExclusoes.slice().sort((a,b)=>(b.quando||'').localeCompare(a.quando||''));
+  tbodyAud.innerHTML=auditoria.map(a=>`<tr>
+    <td>${fmtDate(a.quando?a.quando.slice(0,10):'')} ${a.quando?a.quando.slice(11,16):''}</td>
+    <td>${a.acao}</td>
+    <td>${NOMES_MODULO_EXCLUSAO[a.modulo]||a.modulo||'—'}</td>
+    <td>${a.resumo||'—'}</td>
+    <td>${a.usuario?.nome||'—'}</td>
+    <td>${a.motivo||'—'}</td>
+  </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">Nenhum evento de auditoria ainda.</td></tr>`;
+}
+
+// ─── FIM DA CAMADA CENTRAL DE EXCLUSÃO PROFISSIONAL ────────────────
+
+// ─── EXCLUSÃO EM MASSA POR MÓDULO (Financeiro/Funcionários/DRE/ ───
+// ─── Estoque/Fluxo de Caixa) ────────────────────────────────────────
+// Não cria nenhuma lógica de exclusão nova: cada operação em massa só
+// itera os registros do escopo e chama, registro por registro, as
+// MESMAS funções já usadas pelos botões individuais de cada tela
+// (removerLancamentoELigados, moverRegistroTransacionalParaLixeira,
+// arquivarRegistroReferencia, moverParaLixeira, estornarItensCompra) —
+// ou seja, mesma lixeira (DB.itensExcluidos), mesma auditoria
+// (DB.auditoriaExclusoes), mesma proteção de boleto e o mesmo
+// saveDB(). O único código novo é a ORQUESTRAÇÃO (analisar → mostrar
+// prévia → confirmar → executar em lote → atualizar telas).
+
+const LIMITE_SEGUNDA_CONFIRMACAO_MASSA = 50; // acima disso, pede confirmação extra explícita
+
+NOMES_MODULO_EXCLUSAO['financeiro-massa']='Exclusão em Massa — Financeiro';
+NOMES_MODULO_EXCLUSAO['dre-massa']='Exclusão em Massa — DRE';
+NOMES_MODULO_EXCLUSAO['fluxo-massa']='Exclusão em Massa — Fluxo de Caixa';
+NOMES_MODULO_EXCLUSAO['funcionarios-massa']='Exclusão em Massa — Funcionários';
+NOMES_MODULO_EXCLUSAO['estoque-massa']='Exclusão em Massa — Estoque';
+
+// Mostra/esconde os 5 botões "Gerenciar exclusões" conforme o cargo do
+// usuário logado — chamada após login e após qualquer troca de perfil.
+function atualizarBotoesExclusaoMassa(){
+  const admin=usuarioEhAdmin();
+  ['financeiro','funcionarios','dre','estoque','fluxo'].forEach(m=>{
+    const btn=document.getElementById('btn-massa-'+m);
+    if(btn) btn.style.display=admin?'':'none';
+  });
+}
+
+// Analisa quais outros módulos (Compras/Consumos/Passaportes/
+// Carregadores/Doces Bertocco/Diversos/Hospedagem Diária) têm registro
+// vinculado a algum lançamento da lista informada, e quantos são boleto.
+function analisarVinculosLancamentos(lista){
+  const idsEmEscopo=new Set(lista.map(l=>l.id));
+  const boletos=lista.filter(ehBoleto);
+  const comprasVinc=DB.compras.filter(c=>lista.some(l=>l.origemTipo==='compra'&&l.origemId===c.id));
+  const hospedagemVinc=lista.filter(l=>l.origemTipo==='hospedagem-diaria');
+  const consumosVinc=DB.consumos.filter(c=>c.lancamentoId&&idsEmEscopo.has(c.lancamentoId));
+  const passaportesVinc=DB.passaportes.filter(p=>p.lancamentoId&&idsEmEscopo.has(p.lancamentoId));
+  const carregadoresVinc=DB.carregadores.filter(c=>c.lancamentoId&&idsEmEscopo.has(c.lancamentoId));
+  const docesVinc=DB.docesBertoccoVendas.filter(d=>d.lancamentoId&&idsEmEscopo.has(d.lancamentoId));
+  const diversosVinc=DB.diversos.filter(d=>d.lancamentoId&&idsEmEscopo.has(d.lancamentoId));
+  const totalVinculados=comprasVinc.length+hospedagemVinc.length+consumosVinc.length+passaportesVinc.length+carregadoresVinc.length+docesVinc.length+diversosVinc.length;
+  return {boletos, comprasVinc, hospedagemVinc, consumosVinc, passaportesVinc, carregadoresVinc, docesVinc, diversosVinc, totalVinculados};
+}
+
+function montarAnaliseLancamentos(modulo, nomeExibicao, textoIntro, lista, range){
+  const vinc=analisarVinculosLancamentos(lista);
+  const bullets=[
+    `${lista.length} lançamento(s) encontrado(s)${range?(' no período '+labelPeriodo(range)):''}`,
+    `${vinc.boletos.length} boleto(s) protegido(s) — nunca serão excluídos ou alterados`,
+    `${vinc.totalVinculados} registro(s) vinculados em outros módulos (Compras, Consumos, Passaportes, Carregadores, Doces Bertocco, Diversos, Hospedagem Diária)`,
+    'Estes lançamentos alimentam o Financeiro, a DRE e o Fluxo de Caixa — as três telas serão atualizadas automaticamente depois da operação.',
+  ];
+  return {
+    modulo, tipo:'lancamentos', titulo:`Excluir informações — ${nomeExibicao}`, textoIntro,
+    bullets, totalGeral:lista.length, totalBoletos:vinc.boletos.length, totalVinculados:vinc.totalVinculados,
+    permiteEscolhaAB: vinc.totalVinculados>0,
+    textoA:'Excluir somente os lançamentos financeiros — os registros de Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/Hospedagem Diária vinculados são mantidos (ficam sem lançamento financeiro associado).',
+    textoB:'Excluir também os registros de origem vinculados (Compras/Consumos/Passaportes/Carregadores/Doces Bertocco/Diversos/Hospedagem Diária), usando a mesma proteção (lixeira + auditoria + estorno de estoque) já usada em cada módulo. Boletos e os registros de origem ligados a um boleto nunca são afetados.',
+    escopo:{lista, range},
+  };
+}
+function montarAnaliseFuncionarios(){
+  let ativosComHistorico=0, ativosSemHistorico=0, jaInativos=0;
+  DB.funcionarios.forEach(f=>{
+    if(f.ativo===false){ jaInativos++; return; }
+    if(getDependenciasFuncionario(f.id).temHistorico) ativosComHistorico++; else ativosSemHistorico++;
+  });
+  return {
+    modulo:'funcionarios', tipo:'funcionarios', titulo:'Excluir informações — Funcionários',
+    textoIntro:'Esta ação analisa todos os funcionários cadastrados. Quem já tem folha gerada é arquivado (nunca excluído fisicamente, preservando a referência nas folhas antigas); quem nunca teve folha gerada é excluído.',
+    bullets:[
+      `${DB.funcionarios.length} funcionário(s) no total`,
+      `${ativosComHistorico} possuem folha histórica — serão arquivados`,
+      `${ativosSemHistorico} sem histórico de folha — serão excluídos`,
+      `${jaInativos} já estão inativos — não serão alterados`,
+    ],
+    totalGeral:ativosComHistorico+ativosSemHistorico, totalBoletos:0, totalVinculados:ativosComHistorico,
+    permiteEscolhaAB:false, escopo:{},
+  };
+}
+function montarAnaliseEstoque(){
+  let ativosComHistorico=0, ativosSemHistorico=0, jaInativos=0;
+  DB.estoque.forEach(e=>{
+    if(e.ativo===false){ jaInativos++; return; }
+    if(getDependenciasEstoqueItem(e.id).temHistorico) ativosComHistorico++; else ativosSemHistorico++;
+  });
+  return {
+    modulo:'estoque', tipo:'estoque', titulo:'Excluir informações — Estoque',
+    textoIntro:'Esta ação analisa todos os produtos do estoque (Consumos e Doces Bertocco). Produtos já usados em compras ou vendas são arquivados, preservando o CMV e o histórico de compras/consumos/vendas; produtos nunca usados são excluídos.',
+    bullets:[
+      `${DB.estoque.length} produto(s) no total`,
+      `${ativosComHistorico} já usados em compras/vendas — serão arquivados (CMV e histórico preservados)`,
+      `${ativosSemHistorico} nunca usados — serão excluídos`,
+      `${jaInativos} já estão arquivados — não serão alterados`,
+    ],
+    totalGeral:ativosComHistorico+ativosSemHistorico, totalBoletos:0, totalVinculados:ativosComHistorico,
+    permiteEscolhaAB:false, escopo:{},
+  };
+}
+function analisarExclusaoMassa(modulo){
+  if(modulo==='financeiro'){
+    return montarAnaliseLancamentos('financeiro','Financeiro','Esta ação pode afetar lançamentos financeiros e informações que alimentam DRE e Fluxo de Caixa.', DB.lancamentos.slice(), null);
+  }
+  if(modulo==='dre'){
+    const range=getPeriodoRange(DB.drePeriodoTipo, DB.dreCompetencia, DB.dreQuinzena, DB.dreSemana);
+    const lista=DB.lancamentos.filter(l=>(l.dataCriacao||'')>=range.inicio && (l.dataCriacao||'')<=range.fim);
+    return montarAnaliseLancamentos('dre','DRE', `Esta DRE é calculada a partir dos lançamentos financeiros (regime de competência). Alterar os lançamentos do período abaixo também altera os valores do Financeiro e do Fluxo de Caixa.`, lista, range);
+  }
+  if(modulo==='fluxo'){
+    const range=getPeriodoRange(DB.fluxoPeriodoTipo, DB.fluxoMes, DB.fluxoQuinzena, DB.fluxoSemana);
+    const lista=DB.lancamentos.filter(l=>isPago(l) && l.dataPagamento>=range.inicio && l.dataPagamento<=range.fim);
+    return montarAnaliseLancamentos('fluxo','Fluxo de Caixa', `O Fluxo de Caixa é calculado a partir dos lançamentos financeiros já pagos (regime de caixa). Alterar os lançamentos pagos no período abaixo também altera o Financeiro e a DRE.`, lista, range);
+  }
+  if(modulo==='funcionarios') return montarAnaliseFuncionarios();
+  if(modulo==='estoque') return montarAnaliseEstoque();
+  return null;
+}
+
+let _exclusaoMassaPendente=null;
+function abrirExclusaoMassa(modulo){
+  if(!usuarioEhAdmin()){ toast('Apenas Administrador pode gerenciar exclusões.','error'); return; }
+  const analise=analisarExclusaoMassa(modulo);
+  if(!analise) return;
+  _exclusaoMassaPendente=analise;
+  document.getElementById('massa-modal-titulo').textContent=analise.titulo;
+  document.getElementById('massa-modal-intro').textContent=analise.textoIntro;
+  document.getElementById('massa-modal-bullets').innerHTML=analise.bullets.map(b=>`<li>${b}</li>`).join('');
+  document.getElementById('massa-modal-boleto-aviso').style.display=analise.totalBoletos>0?'block':'none';
+  document.getElementById('massa-modal-boleto-aviso-texto').textContent=`${analise.totalBoletos} boleto(s) serão preservados automaticamente.`;
+  document.getElementById('massa-modal-escolha-ab').style.display=analise.permiteEscolhaAB?'block':'none';
+  if(analise.permiteEscolhaAB){
+    document.getElementById('massa-modal-texto-a').innerHTML=`<strong>Excluir somente este módulo</strong> — ${analise.textoA}`;
+    document.getElementById('massa-modal-texto-b').innerHTML=`<strong>Aplicar também aos dados sincronizados</strong> — ${analise.textoB}`;
+    const radioA=document.querySelector('input[name="massa-modo"][value="A"]');
+    if(radioA) radioA.checked=true;
+  }
+  document.getElementById('massa-modal-motivo').value='';
+  const btn=document.getElementById('massa-modal-btn-confirmar');
+  btn.disabled=false; btn.textContent='Confirmar';
+  openModal('modal-exclusao-massa');
+}
+function cancelarExclusaoMassa(){ _exclusaoMassaPendente=null; closeModal('modal-exclusao-massa'); }
+
+function confirmarExclusaoMassa(){
+  if(!usuarioEhAdmin()){ toast('Apenas Administrador pode gerenciar exclusões.','error'); closeModal('modal-exclusao-massa'); _exclusaoMassaPendente=null; return; }
+  const analise=_exclusaoMassaPendente;
+  if(!analise) return;
+  const btn=document.getElementById('massa-modal-btn-confirmar');
+  if(btn.disabled) return; // proteção contra duplo clique
+  if(analise.totalGeral===0){ toast('Nada a fazer — nenhum registro encontrado neste escopo.'); closeModal('modal-exclusao-massa'); _exclusaoMassaPendente=null; return; }
+  const motivo=(document.getElementById('massa-modal-motivo').value||'').trim();
+  const modoEl=document.querySelector('input[name="massa-modo"]:checked');
+  const modo=analise.permiteEscolhaAB?(modoEl?modoEl.value:'A'):null;
+  if(analise.totalGeral>LIMITE_SEGUNDA_CONFIRMACAO_MASSA){
+    const nomeCurto=analise.titulo.replace('Excluir informações — ','');
+    const ok=confirmar(`Você está prestes a processar ${analise.totalGeral} registro(s) em ${nomeCurto}. Esta operação não poderá ser desfeita diretamente, mas os registros arquivados/excluídos poderão ser restaurados pela Lixeira ("Itens Excluídos"). Deseja continuar?`);
+    if(!ok) return;
+  }
+  btn.disabled=true; btn.textContent='Processando...';
+  setTimeout(()=>{
+    try{
+      const resultado=executarExclusaoMassa(analise, modo, motivo);
+      saveDB();
+      registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado);
+      closeModal('modal-exclusao-massa');
+      _exclusaoMassaPendente=null;
+      toast(`Operação concluída: ${resultado.excluidos} excluído(s), ${resultado.arquivados} arquivado(s), ${resultado.protegidos} protegido(s) (boleto).`);
+      atualizarTelasAposExclusaoMassa();
+    } finally {
+      btn.disabled=false; btn.textContent='Confirmar';
+    }
+  }, 30);
+}
+
+function executarExclusaoMassa(analise, modo, motivo){
+  if(analise.tipo==='lancamentos') return executarExclusaoMassaLancamentos(analise, modo, motivo);
+  if(analise.tipo==='funcionarios') return executarExclusaoMassaFuncionarios(motivo);
+  if(analise.tipo==='estoque') return executarExclusaoMassaEstoque(motivo);
+  return {excluidos:0, arquivados:0, protegidos:0};
+}
+
+// Financeiro/DRE/Fluxo compartilham o mesmo executor: os três operam
+// sobre DB.lancamentos (a única fonte real — DRE e Fluxo continuam
+// sendo apenas cálculos em cima dela, nenhum DB.dre foi criado).
+function executarExclusaoMassaLancamentos(analise, modo, motivo){
+  const {lista}=analise.escopo;
+  const idsEmEscopo=new Set(lista.map(l=>l.id));
+  let excluidos=0, protegidos=0;
+  const motivoPadrao=motivo||`Exclusão em massa (${analise.titulo.replace('Excluir informações — ','')})`;
+
+  if(modo==='B'){
+    // Cascata para os módulos de origem — reaproveita EXATAMENTE a
+    // mesma proteção/estorno já usada nos botões individuais de cada
+    // tela (moverRegistroTransacionalParaLixeira + estorno de estoque
+    // idêntico ao de excluirConsumo/excluirPassaporte/excluirCarregador/
+    // excluirDocesBertocco/excluirCompra). Pula qualquer vínculo cujo
+    // lançamento é boleto, para não deixar um boleto sem sua origem.
+    DB.compras.slice().forEach(compra=>{
+      const lanc=DB.lancamentos.find(l=>l.origemTipo==='compra'&&l.origemId===compra.id);
+      if(!lanc || !idsEmEscopo.has(lanc.id) || ehBoleto(lanc)) return;
+      const idx=DB.compras.findIndex(c=>c.id===compra.id);
+      if(idx<0) return;
+      estornarItensCompra(compra);
+      moverRegistroTransacionalParaLixeira('compras', DB.compras, idx, {motivo:motivoPadrao, modo});
+    });
+    DB.consumos.slice().forEach(c=>{
+      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===c.lancamentoId))) return;
+      const idx=DB.consumos.findIndex(x=>x.id===c.id);
+      if(idx<0) return;
+      const item=DB.estoque.find(e=>e.id===c.itemId); if(item) item.qty+=c.qtd;
+      moverRegistroTransacionalParaLixeira('consumos', DB.consumos, idx, {motivo:motivoPadrao, modo});
+    });
+    DB.passaportes.slice().forEach(p=>{
+      if(!p.lancamentoId || !idsEmEscopo.has(p.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===p.lancamentoId))) return;
+      const idx=DB.passaportes.findIndex(x=>x.id===p.id);
+      if(idx<0) return;
+      const est=DB.passaportesEstoque.find(x=>x.tipo===p.tipo); if(est) est.qty+=p.qtd;
+      moverRegistroTransacionalParaLixeira('passaportes', DB.passaportes, idx, {motivo:motivoPadrao, modo});
+    });
+    DB.carregadores.slice().forEach(c=>{
+      if(!c.lancamentoId || !idsEmEscopo.has(c.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===c.lancamentoId))) return;
+      const idx=DB.carregadores.findIndex(x=>x.id===c.id);
+      if(idx<0) return;
+      const est=DB.carregadoresEstoque.find(x=>x.tipo===c.tipo); if(est) est.qty+=1;
+      moverRegistroTransacionalParaLixeira('carregadores', DB.carregadores, idx, {motivo:motivoPadrao, modo});
+    });
+    DB.docesBertoccoVendas.slice().forEach(d=>{
+      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===d.lancamentoId))) return;
+      const idx=DB.docesBertoccoVendas.findIndex(x=>x.id===d.id);
+      if(idx<0) return;
+      const item=DB.estoque.find(e=>e.id===d.itemId); if(item) item.qty+=d.qtd;
+      moverRegistroTransacionalParaLixeira('docesBertoccoVendas', DB.docesBertoccoVendas, idx, {motivo:motivoPadrao, modo});
+    });
+    DB.diversos.slice().forEach(d=>{
+      if(!d.lancamentoId || !idsEmEscopo.has(d.lancamentoId) || ehBoleto(DB.lancamentos.find(l=>l.id===d.lancamentoId))) return;
+      const idx=DB.diversos.findIndex(x=>x.id===d.id);
+      if(idx<0) return;
+      moverRegistroTransacionalParaLixeira('diversos', DB.diversos, idx, {motivo:motivoPadrao, modo});
+    });
+  }
+
+  // Remove os próprios lançamentos do escopo — reaproveita
+  // removerLancamentoELigados (nunca toca boleto; remove a taxa de
+  // cartão vinculada junto; move para a lixeira; registra auditoria).
+  lista.forEach(l=>{
+    if(!DB.lancamentos.some(x=>x.id===l.id)) return; // já removido (ex.: taxa de cartão de outro lançamento do lote)
+    if(ehBoleto(l)){ protegidos++; return; }
+    removerLancamentoELigados(l.id, {motivo:motivoPadrao, modo});
+    excluidos++;
+  });
+
+  return {excluidos, arquivados:0, protegidos};
+}
+
+function executarExclusaoMassaFuncionarios(motivo){
+  const motivoPadrao=motivo||'Exclusão em massa (Funcionários)';
+  let excluidos=0, arquivados=0;
+  DB.funcionarios.slice().forEach(f=>{
+    if(f.ativo===false) return; // já inativo — não repete a ação
+    const idx=DB.funcionarios.findIndex(x=>x.id===f.id);
+    if(idx<0) return;
+    if(getDependenciasFuncionario(f.id).temHistorico){
+      arquivarRegistroReferencia('funcionarios', DB.funcionarios[idx], {motivo:motivoPadrao});
+      arquivados++;
+    } else {
+      delete DB.folhaPadrao[f.id];
+      DB.funcionarios.splice(idx,1);
+      moverParaLixeira('funcionarios', f, {motivo:motivoPadrao, tipoAcao:'excluido'});
+      excluidos++;
+    }
+  });
+  return {excluidos, arquivados, protegidos:0};
+}
+
+function executarExclusaoMassaEstoque(motivo){
+  const motivoPadrao=motivo||'Exclusão em massa (Estoque)';
+  let excluidos=0, arquivados=0;
+  DB.estoque.slice().forEach(item=>{
+    if(item.ativo===false) return; // já arquivado — não repete a ação
+    const idx=DB.estoque.findIndex(x=>x.id===item.id);
+    if(idx<0) return;
+    if(getDependenciasEstoqueItem(item.id).temHistorico){
+      arquivarRegistroReferencia('estoque', DB.estoque[idx], {motivo:motivoPadrao});
+      arquivados++;
+    } else {
+      DB.estoque.splice(idx,1);
+      moverParaLixeira('estoque', item, {motivo:motivoPadrao, tipoAcao:'excluido'});
+      excluidos++;
+    }
+  });
+  return {excluidos, arquivados, protegidos:0};
+}
+
+function registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado){
+  registrarAuditoria({
+    acao:'exclusao-em-massa', modulo:analise.modulo+'-massa',
+    resumo:`${analise.titulo} — ${resultado.excluidos} excluído(s), ${resultado.arquivados} arquivado(s), ${resultado.protegidos} protegido(s) por serem boleto.${analise.permiteEscolhaAB?(' Opção '+modo+'.'):''} ${analise.totalVinculados} vínculo(s) analisado(s) em outros módulos.`,
+    motivo:motivo||'', modoEscolhido:modo||null,
+    quantidadeAfetada:analise.totalGeral, arquivados:resultado.arquivados, excluidosFisicamente:resultado.excluidos,
+    protegidos:resultado.protegidos, boletosProtegidos:analise.totalBoletos, dependenciasEncontradas:analise.totalVinculados,
+  });
+}
+
+// Atualiza todas as telas que dependem de DB.lancamentos/DB.funcionarios/
+// DB.estoque, sem exigir reload — renderSection já checa a existência
+// de cada elemento antes de escrever nele.
+function atualizarTelasAposExclusaoMassa(){
+  renderSection('financeiro');
+  renderSection('dre');
+  renderSection('fluxo');
+  renderSection('funcionarios');
+  renderSection('estoque');
+  renderSection('compras');
+  renderSection('dashboard');
+  renderItensExcluidos();
+}
+
 // ─── BACKUP E RESTAURAÇÃO DO ERP ───────────────────────────────────
 // Sistema independente, isolado do restante do app: não altera login,
 // autenticação, Supabase, licença, a estrutura do objeto DB nem os
@@ -2592,6 +3523,7 @@ const CHAVES_BACKUP_DB = [
   'formasPagamento','taxasCartao',
   'funcionarios','folhaPadrao','folhasMensais',
   'manutencao',
+  'itensExcluidos','auditoriaExclusoes',
 ];
 
 // Monta um objeto só com os dados atuais do ERP (sem estado de UI
@@ -3198,8 +4130,15 @@ function salvarApartamentoAdmin(){
   renderAdminApartamentos();
 }
 function excluirApartamentoAdmin(idx){
-  if(!confirmar('Excluir este apartamento? Reservas já cadastradas para ele manterão o registro histórico.')) return;
-  DB.apartamentos.splice(idx,1); saveDB(); toast('Apartamento excluído!');
+  const apto=DB.apartamentos[idx]; if(!apto) return;
+  const dep=getDependenciasApartamento(apto.id);
+  if(dep.temHistorico){
+    toast(`Não é possível excluir: ${dep.resumo}. Isso quebraria a referência histórica das reservas. Use o status "Inativo" no cadastro do apartamento em vez de excluir.`,'error');
+    return;
+  }
+  if(!confirmar('Excluir este apartamento? Não há reservas vinculadas a ele.')) return;
+  excluirComProtecaoBasica('apartamentos', DB.apartamentos, idx, {motivo:'Apartamento excluído via Admin'});
+  saveDB(); toast('Apartamento excluído!');
   renderAdminApartamentos();
 }
 function renderAdminApartamentos(){
@@ -3262,7 +4201,7 @@ function salvarHospedagensMensais(){
     if(idxExistente>=0){
       const antigoId=DB.lancamentos[idxExistente].id;
       const idxTaxa=DB.lancamentos.findIndex(l=>l.origemTipo==='taxa-cartao'&&l.origemId===antigoId);
-      if(idxTaxa>=0) DB.lancamentos.splice(idxTaxa,1);
+      if(idxTaxa>=0) removerLancamentoComProtecao(DB.lancamentos[idxTaxa].id, {motivo:'Taxa de cartão recalculada (hospedagem diária editada)'});
     }
     if(valor>0){
       const lanc={
@@ -3276,7 +4215,7 @@ function salvarHospedagensMensais(){
       if(idxExistente>=0) DB.lancamentos[idxExistente]=lanc; else DB.lancamentos.push(lanc);
       registrarTaxaCartaoSeAplicavel(lanc);
     } else if(idxExistente>=0){
-      DB.lancamentos.splice(idxExistente,1);
+      removerLancamentoComProtecao(DB.lancamentos[idxExistente].id, {motivo:'Valor de hospedagem do dia zerado'});
     }
   });
   saveDB(); toast('Lançamento do dia salvo!');
@@ -3319,8 +4258,27 @@ function renderHospMensalHistorico(){
       }
     });
   });
-  tbody.innerHTML=linhas.slice(0,90).map(l=>`<tr><td>${fmtDate(l.dia)}</td><td>${l.cat}</td><td class="td-mono">${fmtMoney(l.val)}</td><td>${l.forma}</td></tr>`).join('')
-    || `<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:20px">Nenhum lançamento registrado ainda.</td></tr>`;
+  tbody.innerHTML=linhas.slice(0,90).map(l=>`<tr><td>${fmtDate(l.dia)}</td><td>${l.cat}</td><td class="td-mono">${fmtMoney(l.val)}</td><td>${l.forma}</td>
+    <td><button class="btn btn-ghost" onclick="excluirHospedagemDiaria('${l.dia}','${l.cat.replace(/'/g,"\\'")}')">Excluir</button></td></tr>`).join('')
+    || `<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">Nenhum lançamento registrado ainda.</td></tr>`;
+}
+// Exclusão do lançamento de hospedagem de UM dia/categoria específico —
+// reaproveita removerLancamentoELigados (já remove a taxa de cartão
+// vinculada e passa pela proteção de boleto/lixeira/auditoria já usada
+// em todo o sistema); a estrutura DB.hospedagensDiarias é só o cache
+// dos valores digitados no formulário (sem dado financeiro próprio),
+// por isso apenas limpa a chave do dia/categoria, no mesmo padrão já
+// usado quando o valor é zerado em salvarHospedagensMensais.
+function excluirHospedagemDiaria(dia, cat){
+  const origemId=dia+'|'+cat;
+  const lanc=DB.lancamentos.find(l=>l.origemTipo==='hospedagem-diaria'&&l.origemId===origemId);
+  if(!lanc){ toast('Lançamento não encontrado.','error'); return; }
+  if(!confirmar(`Excluir o lançamento de hospedagem — ${cat} — ${fmtDate(dia)}?`)) return;
+  removerLancamentoELigados(lanc.id, {motivo:`Lançamento de hospedagem diária excluído (${cat} — ${fmtDate(dia)})`});
+  if(DB.hospedagensDiarias[dia]) delete DB.hospedagensDiarias[dia][cat];
+  saveDB(); toast('Lançamento excluído!');
+  if(DB.hospDiaSelecionado===dia) renderHospedagensMensais();
+  else { renderChartHospDiaria(); renderHospMensalHistorico(); }
 }
 function receitaHospedagemMes(mesAno){
   return DB.lancamentos.filter(l=>l.categoria==='Hospedagem'&&l.tipo==='Receita'&&(l.dataCriacao||'').slice(0,7)===mesAno).reduce((s,l)=>s+l.valor,0);
@@ -3428,7 +4386,8 @@ function salvarReserva(){
 }
 function excluirReserva(idx){
   if(!confirmar('Excluir esta reserva?')) return;
-  DB.reservas.splice(idx,1); saveDB(); toast('Reserva excluída!');
+  excluirComProtecaoBasica('reservas', DB.reservas, idx, {motivo:'Reserva excluída'});
+  saveDB(); toast('Reserva excluída!');
   renderReservasViewAtual();
 }
 function filtrarReservas(q){DB._filtroReservas=(q||'').toLowerCase(); renderReservas();}
@@ -3599,18 +4558,12 @@ function renderChartOrigem(){
   charts.origem.render();
 }
 // ─── CONSUMOS ─────────────────────────────────────────────────────
-function removerLancamentoELigados(lancamentoId){
-  if(!lancamentoId) return;
-  for(let i=DB.lancamentos.length-1;i>=0;i--){
-    const l=DB.lancamentos[i];
-    if(l.id===lancamentoId || (l.origemTipo==='taxa-cartao' && l.origemId===lancamentoId)){
-      DB.lancamentos.splice(i,1);
-    }
-  }
-}
+// removerLancamentoELigados() foi movida para a camada central de
+// exclusão profissional (mais acima no arquivo), agora protegida
+// contra apagar boleto. Esta era a definição antiga/duplicada.
 function popularSelectsConsumo(){
   document.getElementById('consumo-apto').innerHTML=DB.apartamentos.map(a=>`<option value="${a.id}">${a.numero} — ${a.categoria}</option>`).join('');
-  document.getElementById('consumo-item').innerHTML=DB.estoque.filter(e=>e.cat!=='Doces Bertocco').map(e=>`<option value="${e.id}" data-preco="${(e.venda||e.custo).toFixed(2)}" data-custo="${e.custo}">${e.nome}</option>`).join('');
+  document.getElementById('consumo-item').innerHTML=DB.estoque.filter(e=>e.cat!=='Doces Bertocco' && e.ativo!==false).map(e=>`<option value="${e.id}" data-preco="${(e.venda||e.custo).toFixed(2)}" data-custo="${e.custo}">${e.nome}</option>`).join('');
   const formaSel=document.getElementById('consumo-forma-pgto');
   if(formaSel) formaSel.innerHTML=formaPgtoOptionsHTML();
 }
@@ -3684,14 +4637,11 @@ function salvarConsumo(){
   renderSection('consumos');
 }
 function excluirConsumo(idx){
-  if(!confirmar('Excluir este consumo? O estoque será estornado e o lançamento financeiro removido.')) return;
-  const c=DB.consumos[idx];
-  const item=DB.estoque.find(e=>e.id===c.itemId);
-  if(item) item.qty+=c.qtd;
-  removerLancamentoELigados(c.lancamentoId);
-  DB.consumos.splice(idx,1);
-  saveDB(); toast('Consumo excluído!');
-  renderSection('consumos');
+  excluirComLancamentoVinculado('consumos', DB.consumos, idx, {
+    onEstorno:(c)=>{ const item=DB.estoque.find(e=>e.id===c.itemId); if(item) item.qty+=c.qtd; },
+    observacao:'O estoque será estornado automaticamente.',
+    rotulo:'Consumo', msgSucesso:'Consumo excluído!', secaoRender:'consumos',
+  });
 }
 function renderConsumos(){
   const tbody=document.getElementById('consumos-body');
@@ -3742,9 +4692,18 @@ function salvarCafe(){
   renderSection('cafe');
 }
 function excluirCafe(idx){
-  if(!confirmar('Excluir este registro de café da manhã?')) return;
-  DB.cafeDiario.splice(idx,1); saveDB(); toast('Registro excluído!');
-  renderSection('cafe');
+  const c=DB.cafeDiario[idx]; if(!c) return;
+  abrirModalExclusaoGenerico({
+    modulo:'cafeDiario',
+    resumoHTML:resumoRegistro('cafeDiario',c),
+    dependenciasHTML:'Nenhuma dependência financeira encontrada (este módulo não gera lançamento).',
+    temBoleto:false, permiteEscolhaAB:false,
+    aoConfirmar:(motivo)=>{
+      moverRegistroTransacionalParaLixeira('cafeDiario', DB.cafeDiario, idx, {motivo});
+      saveDB(); toast('Registro excluído!');
+      renderSection('cafe');
+    }
+  });
 }
 function comprasAlimentosMes(mesAno){
   return DB.compras.filter(c=>c.centroCusto==='Alimentos' && c.dataCriacao.slice(0,7)===mesAno).reduce((s,c)=>s+c.valorTotal,0);
@@ -3841,14 +4800,11 @@ function salvarPassaporte(){
   renderSection('passaportes');
 }
 function excluirPassaporte(idx){
-  if(!confirmar('Excluir este passaporte? O estoque será estornado e o lançamento financeiro removido.')) return;
-  const p=DB.passaportes[idx];
-  const est=DB.passaportesEstoque.find(x=>x.tipo===p.tipo);
-  if(est) est.qty+=p.qtd;
-  removerLancamentoELigados(p.lancamentoId);
-  DB.passaportes.splice(idx,1);
-  saveDB(); toast('Passaporte excluído!');
-  renderSection('passaportes');
+  excluirComLancamentoVinculado('passaportes', DB.passaportes, idx, {
+    onEstorno:(p)=>{ const est=DB.passaportesEstoque.find(x=>x.tipo===p.tipo); if(est) est.qty+=p.qtd; },
+    observacao:'O estoque será estornado automaticamente.',
+    rotulo:'Passaporte', msgSucesso:'Passaporte excluído!', secaoRender:'passaportes',
+  });
 }
 function renderPassaportes(){
   const tbody=document.getElementById('passaportes-body');
@@ -3936,14 +4892,11 @@ function salvarCarregador(){
   renderSection('carregadores');
 }
 function excluirCarregador(idx){
-  if(!confirmar('Excluir este lançamento de carregador? O estoque será estornado e o lançamento financeiro removido.')) return;
-  const c=DB.carregadores[idx];
-  const est=DB.carregadoresEstoque.find(x=>x.tipo===c.tipo);
-  if(est) est.qty+=1;
-  removerLancamentoELigados(c.lancamentoId);
-  DB.carregadores.splice(idx,1);
-  saveDB(); toast('Lançamento excluído!');
-  renderSection('carregadores');
+  excluirComLancamentoVinculado('carregadores', DB.carregadores, idx, {
+    onEstorno:(c)=>{ const est=DB.carregadoresEstoque.find(x=>x.tipo===c.tipo); if(est) est.qty+=1; },
+    observacao:'O estoque será estornado automaticamente.',
+    rotulo:'Carregador', msgSucesso:'Lançamento excluído!', secaoRender:'carregadores',
+  });
 }
 function renderCarregadores(){
   const grid=document.getElementById('carregadores-estoque');
@@ -3962,7 +4915,7 @@ function renderCarregadores(){
 
 // ─── DOCES BERTOCCO ─────────────────────────────────────────────────
 function popularSelectsDocesBertocco(){
-  document.getElementById('doces-item').innerHTML=DB.estoque.filter(e=>e.cat==='Doces Bertocco').map(e=>`<option value="${e.id}" data-preco="${(e.venda||e.custo).toFixed(2)}" data-custo="${e.custo}">${e.nome} (${e.qty} disp.)</option>`).join('');
+  document.getElementById('doces-item').innerHTML=DB.estoque.filter(e=>e.cat==='Doces Bertocco' && e.ativo!==false).map(e=>`<option value="${e.id}" data-preco="${(e.venda||e.custo).toFixed(2)}" data-custo="${e.custo}">${e.nome} (${e.qty} disp.)</option>`).join('');
   const formaSel=document.getElementById('doces-forma-pgto');
   if(formaSel) formaSel.innerHTML=formaPgtoOptionsHTML();
 }
@@ -4034,14 +4987,11 @@ function salvarDocesBertocco(){
   renderSection('doces-bertocco');
 }
 function excluirDocesBertocco(idx){
-  if(!confirmar('Excluir esta venda? O estoque será estornado e o lançamento financeiro removido.')) return;
-  const d=DB.docesBertoccoVendas[idx];
-  const item=DB.estoque.find(e=>e.id===d.itemId);
-  if(item) item.qty+=d.qtd;
-  removerLancamentoELigados(d.lancamentoId);
-  DB.docesBertoccoVendas.splice(idx,1);
-  saveDB(); toast('Venda excluída!');
-  renderSection('doces-bertocco');
+  excluirComLancamentoVinculado('docesBertoccoVendas', DB.docesBertoccoVendas, idx, {
+    onEstorno:(d)=>{ const item=DB.estoque.find(e=>e.id===d.itemId); if(item) item.qty+=d.qtd; },
+    observacao:'O estoque será estornado automaticamente.',
+    rotulo:'Venda', msgSucesso:'Venda excluída!', secaoRender:'doces-bertocco',
+  });
 }
 function renderDocesBertocco(){
   const tbody=document.getElementById('doces-bertocco-body');
@@ -4114,12 +5064,9 @@ function salvarDiverso(){
   renderSection('diversos');
 }
 function excluirDiverso(idx){
-  if(!confirmar('Excluir este lançamento?')) return;
-  const d=DB.diversos[idx];
-  removerLancamentoELigados(d.lancamentoId);
-  DB.diversos.splice(idx,1);
-  saveDB(); toast('Lançamento excluído!');
-  renderSection('diversos');
+  excluirComLancamentoVinculado('diversos', DB.diversos, idx, {
+    rotulo:'Lançamento', msgSucesso:'Lançamento excluído!', secaoRender:'diversos',
+  });
 }
 function renderDiversos(){
   const tbody=document.getElementById('diversos-body');
@@ -4220,9 +5167,38 @@ function salvarItemEstoque(){
   backupAutomaticoSeAtivo('estoque');
   renderEstoqueTabAtual();
 }
+function excluirProdutoEstoqueComProtecao(idx, onSucesso){
+  const item=DB.estoque[idx]; if(!item) return;
+  const dep=getDependenciasEstoqueItem(item.id);
+  abrirModalExclusaoGenerico({
+    modulo:'estoque',
+    resumoHTML:resumoRegistro('estoque',item),
+    dependenciasHTML: dep.temHistorico
+      ? `${dep.resumo} Por segurança, este produto será <strong>arquivado</strong> (some das listas de novo lançamento, mas continua no histórico/CMV) em vez de excluído fisicamente.`
+      : `${dep.resumo} Pode ser excluído fisicamente.`,
+    temBoleto:false, permiteEscolhaAB:false,
+    aoConfirmar:(motivo)=>{
+      if(dep.temHistorico){
+        arquivarRegistroReferencia('estoque', item, {motivo});
+        toast('Produto arquivado (histórico de CMV preservado)!');
+      } else {
+        DB.estoque.splice(idx,1);
+        moverParaLixeira('estoque', item, {motivo, tipoAcao:'excluido'});
+        toast('Produto excluído!');
+      }
+      saveDB();
+      onSucesso();
+    }
+  });
+}
 function excluirItemEstoque(idx){
-  if(!confirmar('Excluir este item do estoque?')) return;
-  DB.estoque.splice(idx,1); saveDB(); toast('Item excluído!');
+  excluirProdutoEstoqueComProtecao(idx, ()=>renderEstoqueTabAtual());
+}
+function reativarProdutoEstoqueDireto(idx){
+  const e=DB.estoque[idx]; if(!e) return;
+  e.ativo=true;
+  registrarAuditoria({acao:'reativado-direto', modulo:'estoque', registroId:e.id, resumo:resumoRegistro('estoque',e)});
+  saveDB(); toast('Produto reativado!');
   renderEstoqueTabAtual();
 }
 function statusEstoqueItem(e){
@@ -4243,8 +5219,9 @@ function renderEstoque(){
     const idx=DB.estoque.findIndex(x=>x.id===e.id);
     const st=statusEstoqueItem(e);
     const ind=produtoIndicadores(e);
-    return `<tr><td class="td-name">${e.nome}</td><td>${e.cat}</td><td>${e.qty} ${e.und}</td><td>${e.min}</td><td class="td-mono">${fmtMoney(e.custo)}</td><td class="td-mono">${fmtMoney(e.venda||0)}</td><td class="td-mono">${ind.margem.toFixed(1)}%</td><td class="td-mono">${fmtMoney(ind.lucro)}</td><td class="td-mono">${fmtMoney(e.qty*e.custo)}</td>
-    <td><span class="badge ${st.c}">${st.t}</span></td><td><button class="btn btn-ghost" onclick="abrirModalItemEstoque('consumos',${idx})">Editar</button> <button class="btn btn-ghost" onclick="excluirItemEstoque(${idx})">Excluir</button></td></tr>`;
+    const arquivado=e.ativo===false;
+    return `<tr><td class="td-name">${e.nome}${arquivado?' <span class="badge badge-bad" style="margin-left:6px">Arquivado</span>':''}</td><td>${e.cat}</td><td>${e.qty} ${e.und}</td><td>${e.min}</td><td class="td-mono">${fmtMoney(e.custo)}</td><td class="td-mono">${fmtMoney(e.venda||0)}</td><td class="td-mono">${ind.margem.toFixed(1)}%</td><td class="td-mono">${fmtMoney(ind.lucro)}</td><td class="td-mono">${fmtMoney(e.qty*e.custo)}</td>
+    <td><span class="badge ${st.c}">${st.t}</span></td><td><button class="btn btn-ghost" onclick="abrirModalItemEstoque('consumos',${idx})">Editar</button> ${arquivado?`<button class="btn btn-ghost" onclick="reativarProdutoEstoqueDireto(${idx})">Reativar</button>`:`<button class="btn btn-ghost" onclick="excluirItemEstoque(${idx})">Excluir</button>`}</td></tr>`;
   }).join('') || `<tr><td colspan="11" style="text-align:center;color:var(--text3);padding:20px">Nenhum item.</td></tr>`;
   const criticos=DB.estoque.filter(e=>e.cat!=='Doces Bertocco'&&e.qty<=e.min).length;
   const badge=document.getElementById('estoque-alert-badge');
@@ -4340,7 +5317,8 @@ function ajustarQtyCarregador(idx,delta){
 }
 function excluirTipoCarregador(idx){
   if(!confirmar('Excluir este tipo de carregador?')) return;
-  DB.carregadoresEstoque.splice(idx,1); saveDB(); renderEstoqueCarregadores();
+  excluirComProtecaoBasica('carregadoresEstoque', DB.carregadoresEstoque, idx, {motivo:'Tipo de carregador excluído'});
+  saveDB(); renderEstoqueCarregadores();
 }
 function renderEstoqueCarregadores(){
   const tbody=document.getElementById('estoque-carregadores-body');
@@ -4369,7 +5347,8 @@ function ajustarQtyPassaporte(idx,delta){
 }
 function excluirTipoPassaporte(idx){
   if(!confirmar('Excluir este tipo de passaporte?')) return;
-  DB.passaportesEstoque.splice(idx,1); saveDB(); renderEstoquePassaportes();
+  excluirComProtecaoBasica('passaportesEstoque', DB.passaportesEstoque, idx, {motivo:'Tipo de passaporte excluído'});
+  saveDB(); renderEstoquePassaportes();
 }
 function renderEstoquePassaportes(){
   const tbody=document.getElementById('estoque-passaportes-body');
@@ -4382,8 +5361,8 @@ function renderEstoquePassaportes(){
 // ─── COMPRAS (pedidos com múltiplos itens) ─────────────────────────
 let _compraItensTemp = [];
 function popularSelectsCompra(){
-  document.getElementById('compra-fornecedor').innerHTML=DB.fornecedores.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
-  document.getElementById('compra-novo-item').innerHTML=DB.estoque.map(e=>`<option value="${e.id}" data-custo="${e.custo}">${e.nome}</option>`).join('');
+  document.getElementById('compra-fornecedor').innerHTML=DB.fornecedores.map(f=>`<option value="${f.id}">${f.nome}${f.ativo===false?' (Arquivado)':''}</option>`).join('');
+  document.getElementById('compra-novo-item').innerHTML=DB.estoque.filter(e=>e.ativo!==false).map(e=>`<option value="${e.id}" data-custo="${e.custo}">${e.nome}</option>`).join('');
   document.getElementById('compra-centro-custo').innerHTML=DB.centrosCusto.map(c=>`<option>${c}</option>`).join('');
   const formaSel=document.getElementById('compra-forma-pgto');
   if(formaSel) formaSel.innerHTML=formaPgtoOptionsHTML();
@@ -4565,17 +5544,30 @@ function salvarCompra(){
   renderSection('compras');
 }
 function excluirCompra(idx){
-  if(!confirmar('Excluir este pedido de compra? O estoque de todos os itens será estornado e o lançamento financeiro removido.')) return;
-  const compra=DB.compras[idx];
-  estornarItensCompra(compra);
-  for(let i=DB.lancamentos.length-1;i>=0;i--){
-    if(DB.lancamentos[i].origemTipo==='compra' && DB.lancamentos[i].origemId===compra.id){
-      removerLancamentoELigados(DB.lancamentos[i].id);
+  const compra=DB.compras[idx]; if(!compra) return;
+  const lanc=DB.lancamentos.find(l=>l.origemTipo==='compra' && l.origemId===compra.id);
+  const temBoleto=ehBoleto(lanc);
+  abrirModalExclusaoGenerico({
+    modulo:'compras',
+    resumoHTML:resumoRegistro('compras',compra),
+    dependenciasHTML:(lanc?`Lançamento financeiro vinculado: <strong>${resumoRegistro('lancamentos',lanc)}</strong>. `:'')+'O estoque de todos os itens do pedido será estornado automaticamente.',
+    temBoleto,
+    permiteEscolhaAB:!!lanc,
+    aoConfirmar:(motivo,modo)=>{
+      estornarItensCompra(compra);
+      const manterLancamento=modo==='A';
+      if(lanc && !manterLancamento){
+        for(let i=DB.lancamentos.length-1;i>=0;i--){
+          if(DB.lancamentos[i].origemTipo==='compra' && DB.lancamentos[i].origemId===compra.id){
+            removerLancamentoComProtecao(DB.lancamentos[i].id, {motivo:motivo||'Compra excluída', modo});
+          }
+        }
+      }
+      moverRegistroTransacionalParaLixeira('compras', DB.compras, idx, {motivo, modo});
+      saveDB(); toast('Pedido de compra excluído!');
+      renderSection('compras');
     }
-  }
-  DB.compras.splice(idx,1);
-  saveDB(); toast('Pedido de compra excluído!');
-  renderSection('compras');
+  });
 }
 function renderCompras(){
   const tbody=document.getElementById('compras-body');
@@ -4639,15 +5631,41 @@ function editarFornecedor(idx){
   openModal('modal-fornecedor');
 }
 function excluirFornecedor(idx){
-  if(!confirmar('Excluir este fornecedor?')) return;
-  DB.fornecedores.splice(idx,1); saveDB(); toast('Fornecedor excluído!');
+  const f=DB.fornecedores[idx]; if(!f) return;
+  const dep=getDependenciasFornecedor(f.id);
+  abrirModalExclusaoGenerico({
+    modulo:'fornecedores',
+    resumoHTML:resumoRegistro('fornecedores',f),
+    dependenciasHTML: dep.temHistorico
+      ? `${dep.resumo}. Por segurança, este fornecedor será <strong>arquivado</strong> (fica inativo, mas continua identificável nas compras antigas) em vez de excluído fisicamente.`
+      : `${dep.resumo}. Pode ser excluído fisicamente.`,
+    temBoleto:false, permiteEscolhaAB:false,
+    aoConfirmar:(motivo)=>{
+      if(dep.temHistorico){
+        arquivarRegistroReferencia('fornecedores', f, {motivo});
+        toast('Fornecedor arquivado (histórico de compras preservado)!');
+      } else {
+        DB.fornecedores.splice(idx,1);
+        moverParaLixeira('fornecedores', f, {motivo, tipoAcao:'excluido'});
+        toast('Fornecedor excluído!');
+      }
+      saveDB();
+      renderSection('fornecedores');
+    }
+  });
+}
+function reativarFornecedorDireto(idx){
+  const f=DB.fornecedores[idx]; if(!f) return;
+  f.ativo=true;
+  registrarAuditoria({acao:'reativado-direto', modulo:'fornecedores', registroId:f.id, resumo:resumoRegistro('fornecedores',f)});
+  saveDB(); toast('Fornecedor reativado!');
   renderSection('fornecedores');
 }
 function salvarFornecedor(){
   const nome=document.getElementById('fornecedor-nome').value.trim();
   if(!nome){toast('Informe o nome do fornecedor','error');return;}
   const idx=parseInt(document.getElementById('edit-fornecedor-idx').value);
-  const obj={id:idx>=0?DB.fornecedores[idx].id:gerarId(),nome,cat:document.getElementById('fornecedor-categoria').value,telefone:document.getElementById('fornecedor-telefone').value,obs:document.getElementById('fornecedor-obs').value};
+  const obj={id:idx>=0?DB.fornecedores[idx].id:gerarId(),nome,cat:document.getElementById('fornecedor-categoria').value,telefone:document.getElementById('fornecedor-telefone').value,obs:document.getElementById('fornecedor-obs').value,ativo:idx>=0?(DB.fornecedores[idx].ativo!==false):true};
   if(idx>=0) DB.fornecedores[idx]=obj; else DB.fornecedores.push(obj);
   closeModal('modal-fornecedor'); saveDB(); toast('Fornecedor salvo!');
   renderSection('fornecedores');
@@ -4657,12 +5675,13 @@ function renderFornecedores(){
   if(!grid) return;
   grid.innerHTML=DB.fornecedores.map((f,idx)=>{
     const totalCompras=DB.compras.filter(c=>c.fornecedorId===f.id).reduce((s,c)=>s+c.valorTotal,0);
+    const inativo=f.ativo===false;
     return `<div class="vendor-card">
-      <div class="vendor-info"><div class="vendor-name">${f.nome}</div><div class="vendor-meta">${f.cat} · ${f.telefone||'—'}</div></div>
+      <div class="vendor-info"><div class="vendor-name">${f.nome}${inativo?' <span class="badge badge-bad" style="margin-left:6px">Arquivado</span>':''}</div><div class="vendor-meta">${f.cat} · ${f.telefone||'—'}</div></div>
       <div class="vendor-stats"><div class="vendor-total">${fmtMoney(totalCompras)}</div><div class="vendor-last">total em compras</div></div>
       <div style="display:flex;gap:6px;margin-top:10px;grid-column:1/-1">
         <button class="btn btn-ghost" onclick="editarFornecedor(${idx})">Editar</button>
-        <button class="btn btn-ghost" onclick="excluirFornecedor(${idx})">Excluir</button>
+        ${inativo?`<button class="btn btn-ghost" onclick="reativarFornecedorDireto(${idx})">Reativar</button>`:`<button class="btn btn-ghost" onclick="excluirFornecedor(${idx})">Excluir</button>`}
       </div>
     </div>`;
   }).join('') || `<p style="color:var(--text3);grid-column:1/-1;text-align:center;padding:24px">Nenhum fornecedor cadastrado.</p>`;
@@ -4803,8 +5822,37 @@ function salvarLancamento(){
   renderSection('financeiro');
 }
 function excluirLancamento(idx){
-  if(!confirmar('Excluir este lançamento?')) return;
-  DB.lancamentos.splice(idx,1); saveDB(); toast('Lançamento excluído!'); renderSection('financeiro');
+  const l=DB.lancamentos[idx]; if(!l) return;
+  const derivados=DB.lancamentos.filter(x=>(x.origemTipo==='encargo-atraso'||x.origemTipo==='desconto-baixa') && x.origemId===l.id);
+  const irmaosParcela=(l.origemTipo==='parcelamento')?DB.lancamentos.filter(x=>x.origemTipo==='parcelamento' && x.origemId===l.origemId && x.id!==l.id):[];
+  const temBoleto=ehBoleto(l);
+  const partes=[];
+  if(derivados.length) partes.push(`${derivados.length} lançamento(s) de encargo/desconto gerado(s) na baixa deste lançamento`);
+  if(irmaosParcela.length) partes.push(`faz parte de um parcelamento com mais ${irmaosParcela.length} parcela(s) (essas não são afetadas)`);
+  abrirModalExclusaoGenerico({
+    modulo:'lancamentos',
+    resumoHTML:resumoRegistro('lancamentos',l),
+    dependenciasHTML: partes.length ? partes.join('; ')+'.' : 'Nenhuma dependência encontrada.',
+    temBoleto,
+    permiteEscolhaAB: derivados.length>0,
+    aoConfirmar:(motivo,modo)=>{
+      if(temBoleto){
+        // Mesmo em exclusão direta pelo Financeiro, o boleto permanece
+        // 100% intocado — nenhum campo é adicionado/alterado nele.
+        // Apenas registramos a tentativa na auditoria.
+        registrarAuditoria({acao:'tentativa-exclusao-boleto-bloqueada', modulo:'lancamentos', registroId:l.id, resumo:resumoRegistro('lancamentos',l), motivo:motivo||'Tentativa de exclusão direta de boleto em Financeiro'});
+        saveDB(); toast('Boletos nunca são alterados ou excluídos — este registro permanece 100% intacto.');
+        renderSection('financeiro');
+        return;
+      }
+      removerLancamentoComProtecao(l.id, {motivo, modo});
+      if(modo==='B'){
+        derivados.forEach(d=>removerLancamentoComProtecao(d.id, {motivo:motivo||'Excluído junto com o lançamento de origem', modo}));
+      }
+      saveDB(); toast('Lançamento excluído!');
+      renderSection('financeiro');
+    }
+  });
 }
 function limparFiltrosFinanceiro(){
   DB._filtrosFin={}; renderFinanceiro();
@@ -5237,9 +6285,18 @@ function concluirManutencao(idx){
   saveDB(); toast('Chamado concluído!'); renderSection('manutencao');
 }
 function excluirManutencao(idx){
-  if(!confirmar('Excluir este chamado de manutenção?')) return;
-  DB.manutencao.splice(idx,1); saveDB(); toast('Chamado excluído!');
-  renderSection('manutencao');
+  const m=DB.manutencao[idx]; if(!m) return;
+  abrirModalExclusaoGenerico({
+    modulo:'manutencao',
+    resumoHTML:resumoRegistro('manutencao',m),
+    dependenciasHTML:'Nenhuma dependência financeira encontrada (este módulo não gera lançamento).',
+    temBoleto:false, permiteEscolhaAB:false,
+    aoConfirmar:(motivo)=>{
+      moverRegistroTransacionalParaLixeira('manutencao', DB.manutencao, idx, {motivo});
+      saveDB(); toast('Chamado excluído!');
+      renderSection('manutencao');
+    }
+  });
 }
 function renderManutencao(){
   const tbody=document.getElementById('manutencao-body');
@@ -5292,12 +6349,29 @@ function inativarFuncionario(idx){
   saveDB(); renderSection('funcionarios');
 }
 function excluirFuncionario(idx){
-  if(!confirmar('Excluir este funcionário? O histórico de folha já gerado não será apagado, mas o funcionário deixará de aparecer nas próximas folhas.')) return;
-  const f=DB.funcionarios[idx];
-  delete DB.folhaPadrao[f.id];
-  DB.funcionarios.splice(idx,1);
-  saveDB(); toast('Funcionário excluído!');
-  renderSection('funcionarios');
+  const f=DB.funcionarios[idx]; if(!f) return;
+  const dep=getDependenciasFuncionario(f.id);
+  abrirModalExclusaoGenerico({
+    modulo:'funcionarios',
+    resumoHTML:resumoRegistro('funcionarios',f),
+    dependenciasHTML: dep.temHistorico
+      ? `${dep.resumo}. Por segurança, este funcionário será <strong>inativado</strong> (ativo:false) em vez de excluído fisicamente — o histórico de folha permanece 100% íntegro.`
+      : `${dep.resumo}. Pode ser excluído fisicamente.`,
+    temBoleto:false, permiteEscolhaAB:false,
+    aoConfirmar:(motivo)=>{
+      if(dep.temHistorico){
+        arquivarRegistroReferencia('funcionarios', f, {motivo});
+        toast('Funcionário inativado (histórico de folha preservado)!');
+      } else {
+        delete DB.folhaPadrao[f.id];
+        DB.funcionarios.splice(idx,1);
+        moverParaLixeira('funcionarios', f, {motivo, tipoAcao:'excluido'});
+        toast('Funcionário excluído!');
+      }
+      saveDB();
+      renderSection('funcionarios');
+    }
+  });
 }
 function renderFuncionarios(){
   const grid=document.getElementById('funcionarios-grid');
@@ -5357,7 +6431,7 @@ function adicionarItemFolhaPadrao(){
 }
 function removerItemFolhaPadrao(i){
   const funcId=document.getElementById('folha-padrao-func-id').value;
-  garantirFolhaPadrao(funcId).splice(i,1);
+  excluirComProtecaoBasica('folhaPadrao', garantirFolhaPadrao(funcId), i, {motivo:'Item de folha padrão removido', contexto:{funcId}});
   saveDB(); renderFolhaPadraoItens();
 }
 
@@ -5427,7 +6501,15 @@ function adicionarItemFolhaMes(){
 function removerItemFolhaMes(i){
   const funcId=document.getElementById('folha-func-id').value;
   const mesAno=DB.folhaMes;
-  getItensFolhaMes(mesAno,funcId).splice(i,1);
+  const folha=garantirFolhaMes(mesAno);
+  if(folha.pago){
+    toast('Esta folha já foi paga — não é possível remover itens dela (histórico protegido).','error');
+    return;
+  }
+  const itens=getItensFolhaMes(mesAno,funcId);
+  const removido=itens[i];
+  if(!removido) return;
+  excluirComProtecaoBasica('folhaMesItens', itens, i, {motivo:`Item de folha removido (${mesAno})`, contexto:{mesAno,funcId}});
   atualizarLancamentoFolhaSePago(mesAno);
   saveDB(); renderFolhaMesItens();
 }
@@ -5638,7 +6720,7 @@ function setAdminTab(tab,el){
   DB.adminTabAtual=tab;
   document.querySelectorAll('#admin-tabs .tab-inline').forEach(t=>t.classList.remove('on'));
   if(el) el.classList.add('on');
-  ['apartamentos','produtos','fornecedores','funcionarios','usuarios','backups','geral'].forEach(t=>{
+  ['apartamentos','produtos','fornecedores','funcionarios','usuarios','backups','excluidos','geral'].forEach(t=>{
     const div=document.getElementById('admin-tab-'+t);
     if(div) div.style.display=(t===tab)?'block':'none';
   });
@@ -5652,6 +6734,7 @@ function renderAdminTabAtual(){
   else if(tab==='funcionarios') renderAdminFuncionarios();
   else if(tab==='usuarios') renderAdminUsuarios();
   else if(tab==='backups') renderAdminBackups();
+  else if(tab==='excluidos') renderItensExcluidos();
   else if(tab==='geral') renderAdminGeral();
 }
 function renderAdminProdutos(){
@@ -5660,22 +6743,22 @@ function renderAdminProdutos(){
   tbody.innerHTML=DB.estoque.map(e=>{
     const idx=DB.estoque.findIndex(x=>x.id===e.id);
     const ind=produtoIndicadores(e);
-    return `<tr><td class="td-name">${e.nome}</td><td>${e.cat}</td><td>${e.qty} ${e.und}</td><td class="td-mono">${fmtMoney(e.custo)}</td><td class="td-mono">${fmtMoney(e.venda||0)}</td><td class="td-mono">${ind.margem.toFixed(1)}%</td><td class="td-mono">${fmtMoney(ind.lucro)}</td>
-    <td><button class="btn btn-ghost" onclick="abrirModalItemEstoque('${e.cat==='Doces Bertocco'?'doces-bertocco':'consumos'}',${idx})">Editar</button> <button class="btn btn-ghost" onclick="excluirItemEstoqueDoAdmin(${idx})">Excluir</button></td></tr>`;
+    const arquivado=e.ativo===false;
+    return `<tr><td class="td-name">${e.nome}${arquivado?' <span class="badge badge-bad" style="margin-left:6px">Arquivado</span>':''}</td><td>${e.cat}</td><td>${e.qty} ${e.und}</td><td class="td-mono">${fmtMoney(e.custo)}</td><td class="td-mono">${fmtMoney(e.venda||0)}</td><td class="td-mono">${ind.margem.toFixed(1)}%</td><td class="td-mono">${fmtMoney(ind.lucro)}</td>
+    <td><button class="btn btn-ghost" onclick="abrirModalItemEstoque('${e.cat==='Doces Bertocco'?'doces-bertocco':'consumos'}',${idx})">Editar</button> ${arquivado?`<button class="btn btn-ghost" onclick="reativarProdutoEstoqueDireto(${idx})">Reativar</button>`:`<button class="btn btn-ghost" onclick="excluirItemEstoqueDoAdmin(${idx})">Excluir</button>`}</td></tr>`;
   }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhum produto cadastrado.</td></tr>`;
 }
 function excluirItemEstoqueDoAdmin(idx){
-  if(!confirmar('Excluir este produto do estoque?')) return;
-  DB.estoque.splice(idx,1); saveDB(); toast('Produto excluído!');
-  renderAdminProdutos();
+  excluirProdutoEstoqueComProtecao(idx, ()=>renderAdminProdutos());
 }
 function renderAdminFornecedores(){
   const tbody=document.getElementById('admin-fornecedores-body');
   if(!tbody) return;
   tbody.innerHTML=DB.fornecedores.map((f,idx)=>{
     const total=DB.compras.filter(c=>c.fornecedorId===f.id).reduce((s,c)=>s+c.valorTotal,0);
-    return `<tr><td class="td-name">${f.nome}</td><td>${f.cat}</td><td>${f.telefone||'—'}</td><td class="td-mono">${fmtMoney(total)}</td>
-    <td><button class="btn btn-ghost" onclick="editarFornecedor(${idx})">Editar</button> <button class="btn btn-ghost" onclick="excluirFornecedor(${idx})">Excluir</button></td></tr>`;
+    const inativo=f.ativo===false;
+    return `<tr><td class="td-name">${f.nome}${inativo?' <span class="badge badge-bad" style="margin-left:6px">Arquivado</span>':''}</td><td>${f.cat}</td><td>${f.telefone||'—'}</td><td class="td-mono">${fmtMoney(total)}</td>
+    <td><button class="btn btn-ghost" onclick="editarFornecedor(${idx})">Editar</button> ${inativo?`<button class="btn btn-ghost" onclick="reativarFornecedorDireto(${idx})">Reativar</button>`:`<button class="btn btn-ghost" onclick="excluirFornecedor(${idx})">Excluir</button>`}</td></tr>`;
   }).join('') || `<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">Nenhum fornecedor cadastrado.</td></tr>`;
 }
 function renderAdminFuncionarios(){
@@ -5799,7 +6882,16 @@ function adicionarCatalogo(chave){
   saveDB(); renderListaCatalogo(chave); toast('Item adicionado!');
 }
 function removerCatalogo(chave,i){
-  DB[chave].splice(i,1); saveDB(); renderListaCatalogo(chave);
+  const valor=DB[chave][i];
+  if(valor===undefined) return;
+  const dep=getDependenciasCatalogo(chave, valor);
+  if(dep.temHistorico){
+    toast(`Não é possível remover "${valor}": ${dep.resumo}. Remover quebraria a referência do histórico.`,'error');
+    return;
+  }
+  DB[chave].splice(i,1);
+  moverParaLixeira('catalogo', {chave, valor}, {motivo:`Item de catálogo removido (${chave})`, contexto:{chave}, tipoAcao:'excluido'});
+  saveDB(); renderListaCatalogo(chave);
   if(chave==='categoriasApto') renderHospedagensMensais();
 }
 
@@ -6010,6 +7102,7 @@ async function iniciarAppAposLogin(){
   if(saved){ Object.keys(saved).forEach(k=>{ if(saved[k]!==undefined) DB[k]=saved[k]; }); }
   if(!DB.formasPagamento || !DB.formasPagamento.length) DB.formasPagamento=['Débito','Crédito','PIX','TED','Dinheiro'];
   popularSelectCategoriasApto(); popularSelectCategoriasEstoque(); popularSelectCategoriasFornecedores();
+  atualizarBotoesExclusaoMassa();
   renderDashboard();
   updateClock(); setInterval(updateClock,30000);
   // Persistência real em nuvem: o ERP já abriu com o cache local acima
