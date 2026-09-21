@@ -1219,6 +1219,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
   <div class="section-header">
     <div><div class="section-title">Boletos</div><div class="section-sub">Contas a pagar em aberto, por vencimento</div></div>
     <div class="section-actions">
+      <button class="btn btn-ghost" id="btn-massa-boletos" style="display:none" onclick="abrirExclusaoMassa('boletos')">Gerenciar exclusões</button>
       <button class="btn btn-gold" onclick="novaContaPagar()">+ Nova Conta a Pagar</button>
     </div>
   </div>
@@ -1230,7 +1231,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 
   <div class="kpi-grid" id="boletos-kpis" style="margin-bottom:18px"></div>
   <div class="tbl-wrap"><table>
-    <thead><tr><th>Vencimento</th><th>Descrição</th><th>Categoria</th><th>Tipo de Obrigação</th><th>Parcela</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>Vencimento</th><th>Descrição</th><th>Categoria</th><th>Tipo de Obrigação</th><th>Parcela</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
     <tbody id="boletos-body"></tbody>
   </table></div>
 </div>
@@ -1599,7 +1600,7 @@ svg.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);w
 <!-- Modal: Exclusão Profissional (Financeiro/Funcionários/Fornecedores/Estoque/Entradas e Saídas) -->
 <div class="modal-overlay" id="modal-exclusao-profissional">
   <div class="modal">
-    <div class="modal-title">Confirmar Exclusão</div>
+    <div class="modal-title" id="exclusao-modal-titulo">Confirmar Exclusão</div>
     <button class="modal-close" onclick="cancelarExclusaoModal()">✕</button>
     <p style="font-size:13.5px;color:var(--text2);margin:4px 0 8px" id="exclusao-modal-resumo"></p>
     <p style="font-size:12.5px;color:var(--text3);margin-bottom:10px" id="exclusao-modal-dependencias"></p>
@@ -3079,6 +3080,7 @@ function excluirDefinitivamente(itemId, motivo){
 let _exclusaoPendente=null;
 function abrirModalExclusaoGenerico(cfg){
   _exclusaoPendente=cfg;
+  document.getElementById('exclusao-modal-titulo').textContent=cfg.titulo||'Confirmar Exclusão';
   document.getElementById('exclusao-modal-resumo').innerHTML=cfg.resumoHTML||'';
   document.getElementById('exclusao-modal-dependencias').innerHTML=cfg.dependenciasHTML||'';
   document.getElementById('exclusao-modal-boleto-aviso').style.display=cfg.temBoleto?'block':'none';
@@ -3216,12 +3218,13 @@ NOMES_MODULO_EXCLUSAO['dre-massa']='Exclusão em Massa — DRE';
 NOMES_MODULO_EXCLUSAO['fluxo-massa']='Exclusão em Massa — Fluxo de Caixa';
 NOMES_MODULO_EXCLUSAO['funcionarios-massa']='Exclusão em Massa — Funcionários';
 NOMES_MODULO_EXCLUSAO['estoque-massa']='Exclusão em Massa — Estoque';
+NOMES_MODULO_EXCLUSAO['boletos-massa']='Exclusão em Massa — Boletos';
 
-// Mostra/esconde os 5 botões "Gerenciar exclusões" conforme o cargo do
+// Mostra/esconde os botões "Gerenciar exclusões" conforme o cargo do
 // usuário logado — chamada após login e após qualquer troca de perfil.
 function atualizarBotoesExclusaoMassa(){
   const admin=usuarioEhAdmin();
-  ['financeiro','funcionarios','dre','estoque','fluxo'].forEach(m=>{
+  ['financeiro','funcionarios','dre','estoque','fluxo','boletos'].forEach(m=>{
     const btn=document.getElementById('btn-massa-'+m);
     if(btn) btn.style.display=admin?'':'none';
   });
@@ -3303,6 +3306,21 @@ function montarAnaliseEstoque(){
     permiteEscolhaAB:false, permiteEscolhaBoleto:false, escopo:{},
   };
 }
+function montarAnaliseBoletos(){
+  const lista=DB.lancamentos.filter(ehBoleto);
+  const analise=montarAnaliseLancamentos('boletos','Boletos','Esta ação afeta especificamente os lançamentos marcados como Boleto. Eles alimentam o Financeiro, a DRE, o Fluxo de Caixa e o painel de vencimentos desta aba.', lista, null);
+  // Aqui o escopo já é 100% boleto — não faz sentido oferecer a escolha
+  // "lançamentos/boletos/ambos" (ela existe para telas que misturam os
+  // dois tipos, como Financeiro/DRE/Fluxo).
+  analise.permiteEscolhaBoleto=false;
+  analise.alvoBoletoPadrao='boletos';
+  analise.bullets=[
+    `${lista.length} boleto(s) encontrado(s)`,
+    `${analise.totalVinculados} registro(s) vinculados em outros módulos (ex.: a Compra que gerou o boleto)`,
+    'Estes boletos alimentam o Financeiro, a DRE, o Fluxo de Caixa e o painel de vencimentos — todos serão atualizados automaticamente.',
+  ];
+  return analise;
+}
 function analisarExclusaoMassa(modulo){
   if(modulo==='financeiro'){
     return montarAnaliseLancamentos('financeiro','Financeiro','Esta ação pode afetar lançamentos financeiros e informações que alimentam DRE e Fluxo de Caixa.', DB.lancamentos.slice(), null);
@@ -3317,6 +3335,7 @@ function analisarExclusaoMassa(modulo){
     const lista=DB.lancamentos.filter(l=>isPago(l) && l.dataPagamento>=range.inicio && l.dataPagamento<=range.fim);
     return montarAnaliseLancamentos('fluxo','Fluxo de Caixa', `O Fluxo de Caixa é calculado a partir dos lançamentos financeiros já pagos (regime de caixa). Alterar os lançamentos pagos no período abaixo também altera o Financeiro e a DRE.`, lista, range);
   }
+  if(modulo==='boletos') return montarAnaliseBoletos();
   if(modulo==='funcionarios') return montarAnaliseFuncionarios();
   if(modulo==='estoque') return montarAnaliseEstoque();
   return null;
@@ -3332,7 +3351,9 @@ function abrirExclusaoMassa(modulo){
   document.getElementById('massa-modal-intro').textContent=analise.textoIntro;
   document.getElementById('massa-modal-bullets').innerHTML=analise.bullets.map(b=>`<li>${b}</li>`).join('');
   document.getElementById('massa-modal-boleto-aviso').style.display=analise.totalBoletos>0?'block':'none';
-  document.getElementById('massa-modal-boleto-aviso-texto').textContent=`${analise.totalBoletos} boleto(s) encontrado(s) neste escopo. A exclusão de boletos é opcional — escolha abaixo.`;
+  document.getElementById('massa-modal-boleto-aviso-texto').textContent = analise.permiteEscolhaBoleto
+    ? `${analise.totalBoletos} boleto(s) encontrado(s) neste escopo. A exclusão de boletos é opcional — escolha abaixo.`
+    : `Os ${analise.totalBoletos} registro(s) deste escopo são boletos e serão excluídos ao confirmar (vão para a Lixeira, restauráveis).`;
   document.getElementById('massa-modal-escolha-boleto').style.display=analise.permiteEscolhaBoleto?'block':'none';
   if(analise.permiteEscolhaBoleto){
     document.getElementById('massa-modal-boleto-count-lanc').textContent=analise.totalBoletos;
@@ -3365,7 +3386,7 @@ function confirmarExclusaoMassa(){
   const modoEl=document.querySelector('input[name="massa-modo"]:checked');
   const modo=analise.permiteEscolhaAB?(modoEl?modoEl.value:'A'):null;
   const alvoBoletoEl=document.querySelector('input[name="massa-alvo-boleto"]:checked');
-  const alvoBoleto=analise.permiteEscolhaBoleto?(alvoBoletoEl?alvoBoletoEl.value:'lancamentos'):'lancamentos';
+  const alvoBoleto=analise.permiteEscolhaBoleto?(alvoBoletoEl?alvoBoletoEl.value:'lancamentos'):(analise.alvoBoletoPadrao||'lancamentos');
   const incluiBoletoNestaOperacao=alvoBoleto==='boletos'||alvoBoleto==='ambos';
   if(analise.totalGeral>LIMITE_SEGUNDA_CONFIRMACAO_MASSA || (incluiBoletoNestaOperacao && analise.totalBoletos>0)){
     const nomeCurto=analise.titulo.replace('Excluir informações — ','');
@@ -3545,6 +3566,7 @@ function registrarAuditoriaExclusaoMassa(analise, modo, motivo, resultado, alvoB
 // de cada elemento antes de escrever nele.
 function atualizarTelasAposExclusaoMassa(){
   renderSection('financeiro');
+  renderSection('boletos');
   renderSection('dre');
   renderSection('fluxo');
   renderSection('funcionarios');
@@ -5879,23 +5901,35 @@ function excluirLancamento(idx){
   const partes=[];
   if(derivados.length) partes.push(`${derivados.length} lançamento(s) de encargo/desconto gerado(s) na baixa deste lançamento`);
   if(irmaosParcela.length) partes.push(`faz parte de um parcelamento com mais ${irmaosParcela.length} parcela(s) (essas não são afetadas)`);
+  // Resumo detalhado (descrição/beneficiário, vencimento, valor, tipo,
+  // identificador) — pedido explicitamente para a confirmação de boleto,
+  // mas serve igualmente bem para qualquer lançamento.
+  const resumoHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;font-size:13px;margin-bottom:6px">
+    <div><span style="color:var(--text3)">Descrição/Beneficiário:</span> ${l.desc||'—'}</div>
+    <div><span style="color:var(--text3)">Categoria:</span> ${l.categoria||'—'}</div>
+    <div><span style="color:var(--text3)">Vencimento:</span> ${fmtDate(l.dataVencimento)}</div>
+    <div><span style="color:var(--text3)">Valor:</span> ${fmtMoney(l.valor)}</div>
+    ${l.tipoObrigacao?`<div><span style="color:var(--text3)">Tipo de Obrigação:</span> ${l.tipoObrigacao}</div>`:''}
+    <div><span style="color:var(--text3)">ID:</span> <span class="td-mono">${l.id}</span></div>
+  </div>${temBoleto?'<p style="color:var(--text3);font-size:12.5px">Este boleto será movido para a lixeira e poderá ser restaurado posteriormente.</p>':''}`;
   abrirModalExclusaoGenerico({
+    titulo: temBoleto?'Excluir boleto?':'Confirmar Exclusão',
     modulo:'lancamentos',
-    resumoHTML:resumoRegistro('lancamentos',l),
+    resumoHTML,
     dependenciasHTML: partes.length ? partes.join('; ')+'.' : 'Nenhuma dependência encontrada.',
     temBoleto,
     permiteEscolhaAB: derivados.length>0,
     aoConfirmar:(motivo,modo)=>{
       // A exclusão de boleto é permitida quando o próprio administrador
-      // a solicita diretamente aqui no Financeiro (incluirBoleto:true) —
-      // segue exatamente o mesmo caminho protegido de qualquer outro
+      // a solicita diretamente aqui (incluirBoleto:true) — segue
+      // exatamente o mesmo caminho protegido de qualquer outro
       // lançamento: lixeira, auditoria, restauração.
       removerLancamentoComProtecao(l.id, {motivo, modo, incluirBoleto:true});
       if(modo==='B'){
         derivados.forEach(d=>removerLancamentoComProtecao(d.id, {motivo:motivo||'Excluído junto com o lançamento de origem', modo, incluirBoleto:true}));
       }
       saveDB(); toast(temBoleto?'Boleto excluído! Pode ser restaurado pela Lixeira ("Itens Excluídos").':'Lançamento excluído!');
-      renderSection('financeiro');
+      renderSection('financeiro'); renderSection('boletos');
     }
   });
 }
@@ -6050,7 +6084,7 @@ function renderBoletos(){
     const vencido=l.dataVencimento<today();
     return `<tr><td>${fmtDate(l.dataVencimento)}</td><td class="td-name">${l.desc}</td><td>${l.categoria}</td><td>${l.tipoObrigacao||'—'}</td><td>${l.parcelaNum?`${l.parcelaNum}/${l.parcelaTotal}`:'—'}</td><td class="td-mono">${fmtMoney(l.valor)}</td>
     <td><span class="badge ${vencido?'badge-bad':'badge-warn'}">${vencido?'Vencido':'Pendente'}</span></td>
-    <td><button class="btn btn-ghost" onclick="abrirModalPagarLancamento(${idx})">Pagar</button></td></tr>`;
+    <td style="white-space:nowrap"><button class="btn btn-ghost" onclick="abrirModalPagarLancamento(${idx})">Pagar</button> <button class="btn btn-ghost" onclick="excluirLancamento(${idx})">🗑 Excluir</button></td></tr>`;
   }).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">Nenhum boleto em aberto.</td></tr>`;
   const vencidos=lista.filter(x=>x.l.dataVencimento<today());
   document.getElementById('boletos-kpis').innerHTML=[
